@@ -1,0 +1,79 @@
+<p>
+    <a routerLink="/admin/products/new" class="btn btn-primary">New product</a>
+</p>
+
+<div class="table-header">
+    <mat-form-field>
+      <input matInput (keyup)="applyFilter($event.target.value)" placeholder="Filter">
+    </mat-form-field>
+</div>
+  
+<div class="table-container mat-elevation-z8">
+    <mat-table [dataSource]="dataSource" matSort>
+  
+      <!-- Title Column -->
+      <ng-container matColumnDef="title">
+        <mat-header-cell *matHeaderCellDef mat-sort-header> Title </mat-header-cell>
+        <mat-cell *matCellDef="let product"> {{product.title}} </mat-cell>
+      </ng-container>
+  
+      <!-- Price Column -->
+      <ng-container matColumnDef="price">
+        <mat-header-cell *matHeaderCellDef mat-sort-header> Price </mat-header-cell>
+        <mat-cell *matCellDef="let product"> {{product.price | currency:'USD':'symbol'}} </mat-cell>
+      </ng-container>
+  
+      <!-- Edit Column -->
+      <ng-container matColumnDef="edit" >
+        <mat-header-cell *matHeaderCellDef></mat-header-cell>
+        <mat-cell *matCellDef="let product"><a [routerLink]="['/admin/products/', product.$key]">Edit</a></mat-cell>
+      </ng-container>
+  
+      <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+      <mat-row *matRowDef="let row; columns: displayedColumns;">
+      </mat-row>
+    </mat-table>
+  
+    <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]"></mat-paginator>
+</div>
+
+<!--
+Angular 4 Table
+<data-table  [items]="items"  [itemCounts]="itemsCount" (reload)="reloadItems($event)">
+   <data-table-column [property]="'title'" [header]="'Title'" [sortable]="true" [resizable]="true"></data-table-column>
+   <data-table-column [property]="'price'" [header]="'Price'" [sortable]="true" [resizable]="true">
+       <ng-template #dataTableCell let-item="product">
+           {{ product.price | currency:'USD':true}}
+       </ng-template>
+   </data-table-column>
+   <data-table-column [property]="'$key'" >
+           <ng-template #dataTableCell let-item="product">
+               <a [routerLink]="['/admin/products/', p.$key]">Edit</a>
+           </ng-template>
+   </data-table-column>
+</data-table>
+-->
+<!--
+<P>
+    <input #query (keyup)="filter(query.value)" type="text" class="form-control" placeholder="Search...">
+</P>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Title</th>
+            <th>Price</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr *ngFor="let p of filteredProducts"> //Old  "let p of products | async"
+            <td>{{p.title}}</td>
+            <td>{{p.price}}</td>
+            <td>
+                <a [routerLink]="['/admin/products/', p.$key]">Edit</a>
+            </td>
+        </tr>
+    </tbody>
+
+</table>
+-->
