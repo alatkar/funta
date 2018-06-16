@@ -1,0 +1,20 @@
+.tip {
+    padding: 20px;
+    background-color: aqua;
+    border: 1px solid burlywood
+}
+.event {
+    padding: 20px;
+    background-color: coral;
+    border: 1px solid burlywood
+}
+.question {
+    padding: 20px;
+    background-color: deeppink;
+    border: 1px solid burlywood
+}
+.post {
+    padding: 20px;
+    background-color: darkkhaki;
+    border: 1px solid burlywood
+}
