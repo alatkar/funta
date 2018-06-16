@@ -18,7 +18,7 @@ namespace FeedService.Controllers
         public FeedController()
         {
             string EndpointUri = "https://funtadb.documents.azure.com:443/";
-            string PrimaryKey = "asbambsamsb";
+            string PrimaryKey = "6PPu9fnEmjA8ndeG7oaQw8bT0eo6VaIcnaSctqZQrvwa8h3afAUoxYuMQGwleCdH8JUAgwJq3HiB5N726ty0DQ==";
             this.client = new DocumentClient(new Uri(EndpointUri), PrimaryKey);            
         }
 
