@@ -1,26 +1,26 @@
-<div>
-  <div class="navbar navbar-expand-md navbar-light bg-light fixed-top" >
-    <ul class="navbar-nav">
-      <li class="nav-item">
-        <a class="nav-link" routerLink="/products">Products</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" routerLink="/">Services</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" routerLink="/">Resources</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" routerLink="/shopping-cart">Shopping Cart
-          <span class="batge badge-warning badge-pill" *ngIf="cart$ | async as cart">         
-           {{ cart.totalItemsCount}}
-          </span>
-        </a>
+<nav class="navbar navbar-default">
+  <div class="container-fluid">
+    <div class="navbar-header"></div>
+      <a href="#" class="navbar-brand">Funta</a>
+  </div>
+  <div class="navbar-default">
+    <ul class="nav navbar-nav">
+      <li><a href="">Feed</a></li>
+      <li><a href="">Events</a></li>
+      <li><a href="">Resources</a></li>
+      <li class="dropdown">
+        <a href="#" class="dropdown-toggle" role="button">Post <span class="caret"></span></a>
+        <ul class="dropdown-menu">
+            <li><a href="">One</a></li>
+            <li><a href="">Two</a></li>
+            <li><a href="">Resuorces</a></li>
+        </ul>
       </li>
     </ul>
+    
+    <form class="form-inline navbar-right">
+        <input class="form-control mr-sm-2" type="text" placeholder="Search" aria-label="Search">
+        <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+    </form>
   </div>
-  <form class="form-inline my-2 my-lg-0">
-    <input class="form-control mr-sm-2" type="text" placeholder="Search" aria-label="Search">
-    <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
-  </form>
-</div>
+</nav>

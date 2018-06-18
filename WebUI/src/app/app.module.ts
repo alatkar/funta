@@ -4,12 +4,16 @@ import { NgModule } from '@angular/core';
 import { AppComponent } from './app.component';
 import { NavbarComponent } from './navbar/navbar.component';
 import { FeedComponent } from './feed/feed.component';
+import { FeedCreateComponent } from './feed/feed-create/feed-create.component';
+import { FeedDetailComponent } from './feed/feed-detail/feed-detail.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     NavbarComponent,
-    FeedComponent
+    FeedComponent,
+    FeedCreateComponent,
+    FeedDetailComponent
   ],
   imports: [
     BrowserModule

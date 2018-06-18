@@ -1,12 +1,38 @@
-<p class="tip">
-  this is tip!
-</p>
-<p class="post">
-  This is post!
-</p>
-<p class="event">
-  this is event!
-</p>
-<p class="question">
-  This is question!
-</p>
+<!-- 
+<div class="row">
+  <div class="col-xs-12">
+    <a 
+      href="#" 
+      class="list-group-item clearfix" 
+      *ngFor="let feed of feeds">      
+      <div class="pull-left {{feed.type}}">
+        <h4 class="list-group-item-heading">{{feed.heading}}</h4>
+        <p class="list-group-item-text">{{feed.detail}}</p>
+      </div>
+      <span class="pull-right">
+        <img 
+          [src]="feed.imageUrl" 
+          alt="{{ feed.heading }}" 
+          class="img-responsive"
+          style="max-height: 50px;"      
+        >          
+      </span>
+    </a>
+  </div>
+</div>
+This is how each detail Post will be rendered
+-->
+<div class="col-sm-2"></div>
+<div class="col-sm-6"> <!-- Uses all available space -->
+  <div class="row"><div class="row"></div>
+    <app-feed-create></app-feed-create>
+  </div>
+  <div class="row">
+      <ng-container *ngFor="let feed of feeds; let i = index">
+          <div class="col">
+              <app-feed-detail (feedUpdated)= "($event)" [feed]="feed"></app-feed-detail>
+          </div>          
+      </ng-container>   
+    </div>
+</div>
+

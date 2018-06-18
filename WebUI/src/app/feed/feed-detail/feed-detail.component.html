@@ -1,0 +1,21 @@
+<a 
+      href="#" 
+      class="list-group-item clearfix" >      
+      <div class="row">
+      <div class="pull-left {{feed.type}}">
+        <h4 class="list-group-item-heading">{{feed.heading}}</h4>
+        <p class="list-group-item-text">{{feed.detail}}</p>
+      </div>
+      
+      <span class="pull-right">
+        <img 
+          [src]="feed.imageUrl" 
+          alt="{{ feed.heading }}" 
+          class="img-responsive"
+          style="max-height: 50px;"      
+        >          
+      </span>
+    </div>
+    <br>
+    <input type="text" class="form-control" placeholder="Respond" aria-label="Recipient's username" aria-describedby="basic-addon2"> 
+</a>
