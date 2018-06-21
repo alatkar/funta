@@ -30,7 +30,7 @@ export class FeedComponent implements OnInit {
     'https://c.pxhere.com/photos/e4/0c/dogs_fur_animal_pet_portrait_cute_hybrid_dog_hybrid-535989.jpg!d',
     'answer', null, new Date(2018, 5, 12), new Date(2018, 6, 15) ),
     new Feed('6', 'admin', 'Sixth Post', 'Sixth post detail',
-    null,
+    'https://c.pxhere.com/photos/e4/0c/dogs_fur_animal_pet_portrait_cute_hybrid_dog_hybrid-535989.jpg!d',
     'recommendation', null, new Date(2018, 5, 16), new Date(2018, 6, 17) ),
   ];
 
