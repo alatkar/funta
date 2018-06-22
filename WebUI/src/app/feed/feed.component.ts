@@ -43,4 +43,9 @@ export class FeedComponent implements OnInit {
     console.log('FeedComponent received event for feed update ', event);
   }
 
+  onNewFeed(event: Feed) {
+    console.log('FeedComponent received new feed', event);
+    this.feeds.unshift(event);
+  }
+
 }

@@ -1,5 +1,26 @@
-<div class="row">
-  <div class="col-md-5">
-    <button class="btn btn-success">Post Something</button>
-  </div>
+<div class="list-group-item clearfix">
+  <form>
+    <div class="col-md-5 form-group">
+      <label>Heading</label>
+      <input type="text" class="form-control" placeholder="Respond" aria-label="Recipient's username" aria-describedby="basic-addon2" #heading> 
+    </div>
+    <div class="col-md-5 form-group">
+      <label>Detail</label>
+      <input type="text" class="form-control" placeholder="Respond" aria-label="Recipient's username" aria-describedby="basic-addon2" #detail> 
+    </div>
+    <div class="col-md-5 form-group">
+      <label>Image Url</label>
+      <input type="text" class="form-control" placeholder="Respond" aria-label="Recipient's username" aria-describedby="basic-addon2" #imageUrl> 
+    </div>
+    <div class="col-md-5 form-group">
+      <label>Type</label>
+      <input type="text" class="form-control" placeholder="Respond" aria-label="Recipient's username" aria-describedby="basic-addon2" #type> 
+    </div>
+
+    <div class="col-md-5">
+      <button class="btn btn-success" type="submit" (click)="onNewFeed()">Post Something</button>
+    </div>
+  </form>
 </div>
+
+<br>
