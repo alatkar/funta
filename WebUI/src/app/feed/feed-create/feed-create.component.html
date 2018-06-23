@@ -14,7 +14,17 @@
     </div>
     <div class="col-md-5 form-group">
       <label>Type</label>
-      <input type="text" class="form-control" placeholder="Respond" aria-label="Recipient's username" aria-describedby="basic-addon2" #type> 
+      
+      <div class="form-group">
+          <select class="form-control" #type>
+            <option value="tip">Tip</option>
+            <option value="event">Event</option>
+            <option value="question">Question</option>
+            <option value="answer">Answer</option>
+            <option value="recommendation">Recommendation</option>
+            <option value="post">Post</option>
+          </select>
+        </div>
     </div>
 
     <div class="col-md-5">
