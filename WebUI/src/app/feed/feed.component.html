@@ -22,17 +22,14 @@
 </div>
 This is how each detail Post will be rendered
 -->
-<div class="col-sm-2"></div>
-<div class="col-sm-6"> <!-- Uses all available space -->
-  <div class="row"><div class="row"></div>
-    <app-feed-create (newFeed)="onNewFeed($event)"></app-feed-create>
-  </div>
-  <div class="row">
-      <ng-container *ngFor="let feed of feeds; let i = index">
-          <div class="col">
-              <app-feed-detail (feedUpdated)= "($event)" [feed]="feed"></app-feed-detail>
-          </div>          
-      </ng-container>         
-    </div>
+<div class="row">
+  <div class="row"></div>
+  <app-feed-create (newFeed)="onNewFeed($event)"></app-feed-create>
 </div>
-
+<div class="row">
+  <ng-container *ngFor="let feed of feeds; let i = index">
+    <div class="col">
+      <app-feed-detail (feedUpdated)="($event)" [feed]="feed"></app-feed-detail>
+    </div>
+  </ng-container>
+</div>

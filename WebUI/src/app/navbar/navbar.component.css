@@ -1,5 +1,4 @@
 .form-inline input[type=text] {
-    float: right;
     padding: 6px;
     border: none;
     margin-top: 8px;
@@ -7,9 +6,8 @@
 }
 
 .form-inline button[type=submit] {
-    float: right;
     padding: 6px;
     border: none;
     margin-top: 8px;
-    margin-right: 16px;
+    margin-right: 16px;    
 }
