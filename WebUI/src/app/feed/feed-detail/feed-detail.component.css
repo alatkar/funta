@@ -1,30 +1,62 @@
-.tip {
+.tip1 {
     padding: 20px;
     background-color: aqua;
     border: 1px solid burlywood
 }
-.event {
+.event1 {
     padding: 20px;
     background-color: coral;
     border: 1px solid burlywood
 }
-.question {
+.question1 {
     padding: 20px;
     background-color: deeppink;
     border: 1px solid burlywood
 }
-.answer {
+.answer1 {
     padding: 20px;
     background-color: lightcoral;
     border: 1px solid burlywood
 }
-.recommendation {
+.recommendation1 {
     padding: 20px;
     background-color: chartreuse;
     border: 1px solid burlywood
 }
-.post {
+.post1 {
     padding: 20px;
     background-color: darkkhaki;
     border: 1px solid burlywood
 }
+
+
+.tip h4 {
+    color: brown
+}
+.event h4 {
+    color: coral;
+}
+.question h4 {
+    color: deeppink;
+}
+.answer h4 {
+    color: darkgoldenrod;
+}
+.recommendation h4 {
+    color: blueviolet;
+}
+.post h4 {
+    color: darkkhaki;
+}
+
+p {
+    font-style: italic;
+}
+
+img {
+    display: block;
+    max-width:100px;
+    max-height:95px;
+    width: auto;
+    height: auto;
+  }

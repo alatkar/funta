@@ -1,26 +1,33 @@
 <a 
+    style="cursor: pointer;"
     href="#" 
     class="list-group-item clearfix" >      
-    <div class="row">
-      <div class="pull-left {{feed.type}}">
-        <h4 class="list-group-item-heading">{{feed.heading}}</h4>
-        <p class="list-group-item-text">{{feed.detail}}</p>
-      </div>
-      
-      <span class="pull-right" *ngIf="feed.imageUrl">
-        <img 
-          [src]="feed.imageUrl" 
-          alt="{{ feed.heading }}" 
-          class="img-responsive"
-          style="max-height: 50px;"      
-        >          
-      </span>
+    
+    <div class="col-xs-8">
+    <div class="pull-left {{feed.type}}">
+      <h4 class="list-group-item-heading">[{{feed.type}}]: {{feed.heading}}</h4>
+      <p class="list-group-item-text">{{feed.detail}}</p>
+    </div>
+  </div>
+  <div class="col-xs-4">  
+    <span class="pull-right" *ngIf="feed.imageUrl">
+      <img 
+        [src]="feed.imageUrl" 
+        alt="{{ feed.heading }}" 
+        class="img-responsive"          
+      >          
+    </span>
   </div>
   <br>
+  <!--
+  <i class="fa fa-thumbs-up" style="font-size:24px; color: aqua"></i>
+  -->
+  <!--
   <div class="row">
     <div>
       <input type="text" class="form-control" placeholder="Respond" aria-label="Recipient's username" aria-describedby="basic-addon2"> 
     </div>    
   </div>
   <i class="fa fa-cloud" style="font-size:24px;color:darkcyan; padding: 6px;"></i>
+  -->
 </a>

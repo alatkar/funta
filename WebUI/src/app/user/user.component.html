@@ -1,0 +1,20 @@
+<div class="row">
+  <div class="col-xs-12 com-sm-4">
+    <div class="list-group">
+      <a 
+        [routerLink]="['/profile', profile.profileName]"
+        class="list-group-item"
+        *ngFor="let profile of user.profiles">
+        {{ profile.profileName}} : German Shephard
+        <span *ngIf="profile.profileImage">
+            <img 
+              [src]="profile.profileImage" 
+              alt="{{ profile.profileName }}" 
+              class="img-responsive"
+              style="max-height: 50px;"      
+            >          
+          </span>
+      </a>
+    </div>
+  </div>
+</div>

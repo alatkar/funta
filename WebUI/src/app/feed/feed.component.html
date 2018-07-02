@@ -27,9 +27,9 @@ This is how each detail Post will be rendered
   <app-feed-create (newFeed)="onNewFeed($event)"></app-feed-create>
 </div>
 <div class="row">
-  <ng-container *ngFor="let feed of feeds; let i = index">
-    <div class="col">
-      <app-feed-detail (feedUpdated)="($event)" [feed]="feed"></app-feed-detail>
-    </div>
-  </ng-container>
+  <div class="col-xs-12">
+      <app-feed-detail
+      *ngFor="let feed of feeds; let i = index"
+      [feed]="feed"></app-feed-detail>
+  </div>   
 </div>
