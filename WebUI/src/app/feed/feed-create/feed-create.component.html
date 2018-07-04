@@ -1,22 +1,41 @@
-<div class="list-group-item clearfix">
-  <form>
+<form (ngSubmit)="onSubmit(f)" #f="ngForm">
     <div class="col-md-5 form-group">
       <label>Heading</label>
-      <input type="text" class="form-control" placeholder="Your heading..." aria-label="Recipient's username" aria-describedby="basic-addon2" #heading> 
+      <input 
+        type="text" 
+        class="form-control" 
+        name="heading"
+        id="heading"
+        ngModel
+        placeholder="Your heading..."         
+        required> 
     </div>
     <div class="col-md-5 form-group">
       <label>Detail</label>
-      <input type="text" class="form-control" placeholder="Post detail..." aria-label="Recipient's username" aria-describedby="basic-addon2" #detail> 
+      <input type="text" 
+        name="detail"
+        id="detail"
+        ngModel
+        required
+        class="form-control" 
+        placeholder="Post detail..."> 
     </div>
     <div class="col-md-5 form-group">
       <label>Image Url</label>
-      <input type="text" class="form-control" placeholder="Image..." aria-label="Recipient's username" aria-describedby="basic-addon2" #imageUrl> 
+      <input type="text" 
+        name="imageUrl"
+        id="imageUrl"
+        ngModel
+        class="form-control" 
+        placeholder="Image..."> 
     </div>
     <div class="col-md-5 form-group">
-      <label>Type</label>
-      
+      <label>Type</label>      
       <div class="form-group">
-          <select class="form-control" #type>
+          <select class="form-control" 
+            name="type"
+            id="type"
+            ngModel>
             <option value="tip">Tip</option>
             <option value="event">Event</option>
             <option value="question">Question</option>
@@ -28,9 +47,12 @@
     </div>
 
     <div class="col-md-5">
-      <button class="btn" style="background-color:burlywood;" type="submit" (click)="onNewFeed()">Share</button>
+      <button 
+      class="btn" 
+      style="background-color:burlywood;" 
+      type="submit" 
+      [disabled]="!f.valid">Share</button>
     </div>
   </form>
-</div>
 
-<br>
+

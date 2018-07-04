@@ -1,5 +1,7 @@
 import { Component, OnInit, ViewChild, ElementRef, Output, EventEmitter } from '@angular/core';
 import { Feed } from 'src/app/models/feed';
+import { NgForm } from '@angular/forms';
+import { FeedService } from 'src/app/services/feed.service';
 
 @Component({
   selector: 'app-feed-create',
@@ -8,18 +10,22 @@ import { Feed } from 'src/app/models/feed';
 })
 export class FeedCreateComponent implements OnInit {
   @Output('newFeed') newFeed = new EventEmitter<Feed>();
-  @ViewChild('heading') heading: ElementRef;
-  @ViewChild('detail') detail: ElementRef;
-  @ViewChild('imageUrl') imageUrl: ElementRef;
-  @ViewChild('type') type: ElementRef;
 
-  constructor() { }
+  constructor(private feedService: FeedService) { }
 
   ngOnInit() {
   }
 
-  onNewFeed() {
+  onSubmit(form: NgForm) {
+    console.log(form.value.detail);
+    console.log(form.value);
+    this.feedService.addNewFeed(
+      new Feed('5', 'admin', form.value.heading, form.value.detail, form.value.imageUrl,
+      form.value.type, null, null, null)
+    );
+    form.reset();
     // Hack to validate form. This should happne in Template
+    /*
     if (this.heading.nativeElement.value !== '' &&
         this.detail.nativeElement.value !== '' &&
         this.type.nativeElement.value !== '') {
@@ -27,5 +33,6 @@ export class FeedCreateComponent implements OnInit {
               this.detail.nativeElement.value, this.imageUrl.nativeElement.value, 
               this.type.nativeElement.value, null, new Date(), new Date()));
     }
+    */
   }
 }

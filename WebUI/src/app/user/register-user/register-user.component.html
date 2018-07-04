@@ -1,0 +1,43 @@
+<form #registerUserForm="ngForm" (ngSubmit)="onSubmit(registerUserForm)">
+  <div class="form-group">
+    <label for="email">Email Id</label>
+    <input 
+      type="email"
+      id="email" 
+      ngModel 
+      name="email"
+      required
+      email
+      class="form-control"
+      #email="ngModel"
+      >
+      <span *ngIf="!email.valid && email.touched" class="help-block">Please enter a valid email!</span>
+  </div>
+  <div class="form-group">
+      <label for="password">Password</label>
+      <input type="password"
+        id="password" 
+        name="password" 
+        ngModel 
+        required 
+        class="form-control"
+        #password="ngModel"
+        >
+        <span *ngIf="!password.valid && password.touched" class="help-block">Please enter a valid password!</span>
+  </div>
+  <div class="form-group">
+      <label for="userName">User Name: </label>
+      <input 
+        type="text"
+        id="userName" 
+        ngModel 
+        name="userName"
+        required
+        class="form-control"
+        #userName="ngModel"
+        >
+        <span *ngIf="!userName.valid && userName.touched" class="help-block">Please enter a valid userName!</span>
+  </div>
+  <p *ngIf="!registerUserForm.valid && registerUserForm.touched">Form is invalid!</p>
+  <button class="btn btn-primary" type="submit">Submit</button>      
+</form>

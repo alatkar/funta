@@ -1,3 +1,4 @@
+import { HttpClient } from '@angular/common/http';
 import { Injectable, EventEmitter } from '@angular/core';
 import { Feed } from 'src/app/models/feed';
 
@@ -33,9 +34,10 @@ export class FeedService {
   ];
 
   newFeed = new EventEmitter<Feed>();
-  constructor() { }
+  constructor(/*private feedService: HttpClient*/) { }
 
   getFeed() {
+    // this.feedService.get('');
     return this.feeds.slice();
   }
 

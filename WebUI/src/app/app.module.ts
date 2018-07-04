@@ -1,3 +1,4 @@
+import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
@@ -13,6 +14,8 @@ import { FeedDetailComponent } from './feed/feed-detail/feed-detail.component';
 import { UserComponent } from './user/user.component';
 import { ProfileComponent } from './user/profile/profile.component';
 import { NotFoundComponent } from './not-found/not-found.component';
+import { RegisterUserComponent } from './user/register-user/register-user.component';
+import { RegisterProfileComponent } from './user/profile/register-profile/register-profile.component';
 
 @NgModule({
   declarations: [
@@ -23,9 +26,12 @@ import { NotFoundComponent } from './not-found/not-found.component';
     FeedDetailComponent,
     ProfileComponent,
     UserComponent,
-    NotFoundComponent
+    NotFoundComponent,
+    RegisterUserComponent,
+    RegisterProfileComponent
   ],
   imports: [
+    FormsModule,
     BrowserModule,
     AngularFontAwesomeModule,
     RouterModule.forRoot([
@@ -33,6 +39,7 @@ import { NotFoundComponent } from './not-found/not-found.component';
       // Open URLs
       { path: '', component: FeedComponent /*HomeComponent*/ },
       { path: 'home', component: FeedComponent /*HomeComponent*/ },
+      { path: 'post', component: FeedCreateComponent /*HomeComponent*/ },
       { path: 'products', component: FeedComponent },
       { path: 'user', component: UserComponent },
       { path: 'user/:id', component: UserComponent },
