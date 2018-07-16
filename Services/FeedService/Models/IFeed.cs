@@ -1,18 +1,17 @@
 
 using System;
 using System.Runtime.Serialization;
+using core.repository.azureCosmos;
 using Newtonsoft.Json;
 
 namespace FeedService.Models
 {
-    public abstract class IFeed
+    public abstract class IFeed : DocumentBase
     {
         public IFeed()
         {
         }
 
-        [DataMember(Name =  "id")]
-        public Guid Id { get; set; }
 
         [DataMember(Name =  "userName")]
         public string UserName { get; set; }
@@ -33,5 +32,5 @@ namespace FeedService.Models
         {
             return JsonConvert.SerializeObject(this);
         }
-    }
 }
+    }

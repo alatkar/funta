@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using core;
+using core.repository;
+using core.repository.azureCosmos;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -27,11 +30,14 @@ namespace FeedService
         {
             services.AddMvc();
             services.AddCors();
+
+            //services.AddTransient<IGetDocClient, Class1>();            
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
+            Initialize();
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -41,6 +47,13 @@ namespace FeedService
                 options => options.WithOrigins("http://localhost:4200").AllowAnyMethod()
             );
             app.UseMvc();
+        }
+
+        private void Initialize()
+        {
+            var token = authorization.GetToken().Result;
+            IRepository repo = AzureCosmosDocRepository.CreateAzureCosmosDocRepository("FeedCollection", token).Result;
+            Container.CreateContainer(repo);
         }
     }
 }

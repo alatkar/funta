@@ -1,6 +1,26 @@
 <div class="row">
   <div class="col-xs-12 com-sm-4">
     <div class="list-group">
+      <a
+      [routerLink]="['/user/edit', user.userName]">
+      <span *ngIf="user.profileImage">
+          <img 
+            [src]="user.profileImage" 
+            alt="{{ user.userName }}" 
+            class="img-responsive"
+            style="max-height: 50px;"      
+          >          
+        </span>
+        <h2>User Name: {{user.userName}}</h2>
+        <h3>Name: {{user.firstName}} {{user.lastName}}</h3>
+        <h4>Date Registered: {{user.dateRegistereded}}</h4>
+      </a>
+    </div>
+  </div>  
+</div>
+<div class="row">
+  <div class="col-xs-12 com-sm-4">
+    <div class="list-group">
       <a 
         [routerLink]="['/profile', profile.profileName]"
         class="list-group-item"

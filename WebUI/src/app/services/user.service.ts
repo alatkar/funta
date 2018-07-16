@@ -17,7 +17,7 @@ export class UserService {
     profiles.unshift(this.getProfileByProfileName('1'));
 
     return new User('1', 'admin', 'Admin', 'Funta',
-      'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSY4JYuRJp-UAtuK3Jwlb5BICPxy8PObpuqWvv-1NoUxNMqBR5Yyw',
+    'https://www.maxpixel.net/static/photo/1x/Sweet-Grass-Nice-Dog-Brown-Bitch-Dogs-Sun-2679538.jpg',
       new Address(), profiles, new Date('04/04/2018'));
   }
 

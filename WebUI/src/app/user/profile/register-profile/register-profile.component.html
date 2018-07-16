@@ -1,4 +1,4 @@
-<form #registerProfileForm="ngForm" (ngSubmit)="onSubmit(registerProfileForm)">    
+<form #f="ngForm" (ngSubmit)="onSubmit(f)">    
   <div class="form-group">
     <label for="profileName">Profile Name: </label>
     <input 
@@ -25,6 +25,6 @@
       </option>
       </select>
   </div>
-  <p *ngIf="!registerProfileForm.valid && registerProfileForm.touched">Form is invalid!</p>
-  <button class="btn btn-primary" type="submit">Submit</button>      
+  <p *ngIf="!f.valid && f.touched">Form is invalid!</p>
+  <button class="btn btn-primary" type="submit" [disabled]="!f.valid">Submit</button>      
 </form>
