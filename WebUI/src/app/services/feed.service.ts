@@ -1,6 +1,8 @@
+import { Observable } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { Injectable, EventEmitter } from '@angular/core';
 import { Feed } from 'src/app/models/feed';
+import { HttpResponse } from 'selenium-webdriver/http';
 
 @Injectable({
   providedIn: 'root'
@@ -34,15 +36,27 @@ export class FeedService {
   ];
 
   newFeed = new EventEmitter<Feed>();
-  constructor(/*private feedService: HttpClient*/) { }
+  constructor(private feedService: HttpClient) { }
 
-  getFeed() {
-    // this.feedService.get('');
-    return this.feeds.slice();
+  getFeed(): any {
+    return this.feedService.get<Feed[]>('http://localhost:5000/api/feed', {observe: 'response'});
+    /*
+      .subscribe((resp: Response) => {
+        console.log(resp);
+        this.feeds = {... resp.body};
+        return resp;
+        //feeds = resp.json();
+    }
+    , err => console.log(err));
+    //return this.feeds.slice();*/
   }
 
-  addNewFeed(feed: Feed) {
+  addNewFeed(feed: Feed): Observable<Feed> {
+    //const headers = new Headers ({'Content-Type': 'application/json'});
+    //return this.feedService.post('f', feed, {headers: headers}).subscribe();
     this.feeds.unshift(feed);
     this.newFeed.emit(feed);
+
+    return null;
   }
 }

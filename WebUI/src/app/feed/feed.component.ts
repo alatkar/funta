@@ -1,6 +1,7 @@
 import { Feed } from 'src/app/models/feed';
 import { FeedService } from './../services/feed.service';
 import { Component, OnInit } from '@angular/core';
+import { HttpResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-feed',
@@ -15,11 +16,15 @@ export class FeedComponent implements OnInit {
    }
 
   ngOnInit() {
-    this.feeds = this.feedService.getFeed();
+    this.feedService.getFeed().subscribe((data: HttpResponse<any>) => {
+      console.log(data);
+      const temp = data.body;
+      this.feeds = {...data.body};
+    });
     this.feedService.newFeed.subscribe(
       (feed: Feed)  => {
         console.log('New Feed Created ' + feed);
-        this.feeds = this.feedService.getFeed();
+        this.feedService.getFeed().subscribe((data: Feed[]) => this.feeds = {...data});
       }
     );
   }
