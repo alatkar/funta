@@ -39,7 +39,7 @@ export class FeedService {
   constructor(private feedService: HttpClient) { }
 
   getFeed(): any {
-    return this.feedService.get<Feed[]>('http://localhost:5000/api/feed', {observe: 'response'});
+    return this.feedService.get<Feed[]>('http://localhost:5000/api/feed');
     /*
       .subscribe((resp: Response) => {
         console.log(resp);
@@ -52,8 +52,8 @@ export class FeedService {
   }
 
   addNewFeed(feed: Feed): Observable<Feed> {
-    //const headers = new Headers ({'Content-Type': 'application/json'});
-    //return this.feedService.post('f', feed, {headers: headers}).subscribe();
+    // const headers = new Headers ({'Content-Type': 'application/json'});
+    // return this.feedService.post('f', feed, {headers: headers}).subscribe();
     this.feeds.unshift(feed);
     this.newFeed.emit(feed);
 

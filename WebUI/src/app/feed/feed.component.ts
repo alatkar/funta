@@ -16,15 +16,15 @@ export class FeedComponent implements OnInit {
    }
 
   ngOnInit() {
-    this.feedService.getFeed().subscribe((data: HttpResponse<any>) => {
+    this.feedService.getFeed().subscribe((data: Feed[]) => {
       console.log(data);
-      const temp = data.body;
-      this.feeds = {...data.body};
+      const temp = data;
+      this.feeds = data; // {...data.body};
     });
     this.feedService.newFeed.subscribe(
       (feed: Feed)  => {
         console.log('New Feed Created ' + feed);
-        this.feedService.getFeed().subscribe((data: Feed[]) => this.feeds = {...data});
+        this.feedService.getFeed().subscribe((data: Feed[]) => this.feeds = data);
       }
     );
   }
