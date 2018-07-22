@@ -4,8 +4,14 @@ using Newtonsoft.Json;
 
 namespace core.repository.azureCosmos
 {
-    public abstract class DocumentBase : Microsoft.Azure.Documents.Document
+    public abstract class DocumentBase //: Microsoft.Azure.Documents.Document
     {
+        [JsonProperty("id")]
+        public string Id { get; set; }
+
+        [JsonProperty("_etag")]
+        public string ETag { get; }
+
         public override string ToString()
         {
             return JsonConvert.SerializeObject(this);

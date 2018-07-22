@@ -12,7 +12,7 @@ namespace core.repository
 
          Task<T> UpdateAsync<T>(T doc, FeedOptions options) where T : DocumentBase;
 
-         Task<T> DeleteAsync<T>(T doc, FeedOptions options);
+         Task DeleteAsync(string docId, FeedOptions options);
 
          Task<T> GetAsync<T>(string id, FeedOptions options);
 

@@ -59,9 +59,10 @@ namespace core.repository.azureCosmos
         {
             try{
                 var existing = await this.client.ReadDocumentAsync(UriFactory.CreateDocumentUri(databaseName, collectionName, doc.Id));   
-                dynamic json = JObject.FromObject(existing.Resource);
-                json.id = doc.Id; //Didn't understand why earlier approach didn't work
-                return await this.client.ReplaceDocumentAsync(existing.Resource.SelfLink, json);             
+                dynamic json = JObject.FromObject(doc);
+                //json.id = doc.Id; //Didn't understand why earlier approach didn't work                
+                var res =  await this.client.ReplaceDocumentAsync(existing.Resource.SelfLink, json);   
+                return (dynamic)res.Resource;          
             }
             catch(Exception ex)
             {
@@ -82,16 +83,17 @@ namespace core.repository.azureCosmos
             return query;
         }
 
-        public Task<T> DeleteAsync<T>(T doc, FeedOptions options)
+        public async Task DeleteAsync(string docId, FeedOptions options)
         {
-            throw new System.NotImplementedException();
+            var existing = await this.client.ReadDocumentAsync(UriFactory.CreateDocumentUri(databaseName, collectionName, docId));
+            await this.client.DeleteDocumentAsync(existing.Resource.SelfLink);
         }
 
         public async Task<T> CreateFeedIfNotExists<T>(T doc, FeedOptions options) where T : DocumentBase
         {
             try
             {
-                var res = await this.client.ReadDocumentAsync(UriFactory.CreateDocumentUri(databaseName, collectionName, doc.Id.ToString()));      
+                var res = await this.client.ReadDocumentAsync(UriFactory.CreateDocumentUri(databaseName, collectionName, doc.Id?.ToString()));      
                 return (dynamic)res.Resource;          
             }
             catch (DocumentClientException de)
