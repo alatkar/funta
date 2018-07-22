@@ -16,7 +16,7 @@ export class Feed {
          heading: string,
          data: string,
          imageUrl: string,
-         type: string,
+         type: FeedTypeEnum,
          followups: Feed,
          dateCreated: Date,
          dateLastUpdated: Date) {
@@ -25,7 +25,7 @@ export class Feed {
              this.heading = heading;
              this.data = data;
              this.imageUrl = imageUrl;
-             this.type = type; // FeedTypeEnum[type];
+             this.type = FeedTypeEnum[type];
              this.followups = followups;
              this.dateCreated = dateCreated;
              this.dateLastUpdated = dateLastUpdated;
