@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
 using System.Threading.Tasks;
 using core;
 using core.repository;
@@ -31,7 +32,7 @@ namespace FeedService.Controllers
         }
 
         [HttpGet]
-        public async Task<IEnumerable<IFeed>> GetAsync() 
+        public async Task<IEnumerable<Feed>> GetAsync() 
         {
             try
             {
@@ -78,7 +79,7 @@ namespace FeedService.Controllers
         {
             try
             {
-                var result = await repo.CreateFeedIfNotExists(doc, null);    
+                var result = await repo.CreateAsync(doc, null);    
                 Feed fd = (dynamic)result;
                 return fd;                
             }
@@ -115,6 +116,30 @@ namespace FeedService.Controllers
                     Console.WriteLine("Error: {0}, Message: {1}", e.Message, baseException.Message);
             }
             return null;
+        }
+
+        [HttpDelete("{id}")]
+        public async Task DeleteAsync(string id) //TODO: Figure out how to send error codes instead of 500
+        {            
+            await repo.DeleteAsync(id, null); 
+            /*
+            try
+            {
+                await repo.DeleteAsync(id, null); 
+                //return HttpStatusCode.OK;
+            }
+            catch (DocumentClientException de)
+            {
+                    Exception baseException = de.GetBaseException();
+                    Console.WriteLine("{0} error occurred: {1}, Message: {2}", de.StatusCode, de.Message, baseException.Message);                    
+                    //return HttpStatusCode.NotFound;
+            }
+            catch (Exception e)
+            {
+                    Exception baseException = e.GetBaseException();
+                    Console.WriteLine("Error: {0}, Message: {1}", e.Message, baseException.Message);
+                    throw;
+            } */
         }
     }
 }
