@@ -35,6 +35,10 @@ export class FeedComponent implements OnInit {
 
   onNewFeed(event: Feed) {
     console.log('FeedComponent received new feed', event);
-    this.feedService.addNewFeed(event);
+    this.feedService.addNewFeed(event).subscribe(
+      (response: any) => {
+        console.log(response);
+      }
+    );
   }
 }

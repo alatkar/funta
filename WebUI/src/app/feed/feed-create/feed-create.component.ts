@@ -21,8 +21,9 @@ export class FeedCreateComponent implements OnInit {
     console.log(form.value);
     this.feedService.addNewFeed(
       new Feed('5', 'admin', form.value.heading, form.value.detail, form.value.imageUrl,
-      form.value.type, null, null, null)
-    );
+      form.value.type, null, new Date(), new Date())
+    ).subscribe((resp: Feed ) =>  {console.log('received post respone ', resp); }
+  );
     form.reset();
     // Hack to validate form. This should happne in Template
     /*
