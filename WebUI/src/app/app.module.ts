@@ -17,6 +17,9 @@ import { ProfileComponent } from './user/profile/profile.component';
 import { NotFoundComponent } from './not-found/not-found.component';
 import { RegisterUserComponent } from './user/register-user/register-user.component';
 import { RegisterProfileComponent } from './user/profile/register-profile/register-profile.component';
+import { SignupComponent } from './auth/signup/signup.component';
+import { SigninComponent } from './auth/signin/signin.component';
+import { AuthGuard } from './services/auth-guard.service';
 
 @NgModule({
   declarations: [
@@ -29,7 +32,9 @@ import { RegisterProfileComponent } from './user/profile/register-profile/regist
     UserComponent,
     NotFoundComponent,
     RegisterUserComponent,
-    RegisterProfileComponent
+    RegisterProfileComponent,
+    SignupComponent,
+    SigninComponent
   ],
   imports: [
     FormsModule,
@@ -39,16 +44,17 @@ import { RegisterProfileComponent } from './user/profile/register-profile/regist
     RouterModule.forRoot([
       // Routes should be from most specific to general
       // Open URLs
-      { path: '', component: FeedComponent /*HomeComponent*/ },
-      { path: 'home', component: FeedComponent /*HomeComponent*/ },
-      { path: 'post', component: FeedCreateComponent /*HomeComponent*/ },
-      { path: 'products', component: FeedComponent },
-      { path: 'user', component: UserComponent },
-      { path: 'user/:id', component: UserComponent },
-      { path: 'profile', component: ProfileComponent },
-      { path: 'profile/:id', component: ProfileComponent },
-      { path: 'profile/:userName', component: ProfileComponent },
-      { path: 'login', component: FeedComponent },
+      { path: '', component: FeedComponent /*HomeComponent*/ , canActivate: [AuthGuard]},
+      { path: 'home', component: FeedComponent /*HomeComponent*/, canActivate: [AuthGuard] },
+      { path: 'post', component: FeedCreateComponent /*HomeComponent*/ , canActivate: [AuthGuard]},
+      { path: 'products', component: FeedComponent , canActivate: [AuthGuard]},
+      { path: 'user', component: UserComponent , canActivate: [AuthGuard]},
+      { path: 'user/:id', component: UserComponent , canActivate: [AuthGuard]},
+      { path: 'profile', component: ProfileComponent , canActivate: [AuthGuard]},
+      { path: 'profile/:id', component: ProfileComponent , canActivate: [AuthGuard]},
+      { path: 'profile/:userName', component: ProfileComponent , canActivate: [AuthGuard]},
+      { path: 'signup', component: SignupComponent },
+      { path: 'signin', component: SigninComponent },
       { path: 'not-found', component: NotFoundComponent },
       { path: '**', redirectTo: 'not-found' },
     ])

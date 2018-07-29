@@ -1,9 +1,9 @@
+import { AuthService } from './auth.service';
 import { FeedTypeEnum } from './../models/feedTypeEnum';
 import { Observable } from 'rxjs';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable, EventEmitter } from '@angular/core';
 import { Feed } from 'src/app/models/feed';
-import { HttpResponse } from 'selenium-webdriver/http';
 
 @Injectable({
   providedIn: 'root'
@@ -37,10 +37,11 @@ export class FeedService {
   ];
 
   newFeed = new EventEmitter<Feed>();
-  constructor(private feedService: HttpClient) { }
+  constructor(private feedService: HttpClient, private authService: AuthService) { }
 
   getFeed(): any {
-    return this.feedService.get<Feed[]>('http://localhost:5000/api/feed');
+    const headers = this.getHeaders();
+    return this.feedService.get<Feed[]>('http://localhost:5000/api/feed', {headers: headers});
     /*
       .subscribe((resp: Response) => {
         console.log(resp);
@@ -58,6 +59,13 @@ export class FeedService {
     this.feeds.unshift(feed);
     this.newFeed.emit(feed);
 
-    return this.feedService.post<Feed>('http://localhost:5000/api/feed', feed);
+    const headers = this.getHeaders();
+    return this.feedService.post<Feed>('http://localhost:5000/api/feed', feed, {headers: headers});
+  }
+
+  private getHeaders(): HttpHeaders {
+    const token = this.authService.getToken();
+    return new HttpHeaders().set('Content-Type', 'application/json')
+    .set('authorization', 'Bearer ' + token);
   }
 }

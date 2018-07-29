@@ -33,12 +33,25 @@
           </button>
         </form>
       </li>
-      <li>
-        <a routerLink="/user">User/Profile</a>
-      </li>
-      <li>
-        <a routerLink="/home">Notification</a>
-      </li>
+      <ng-template [ngIf]="authService.isAuthenticated()">
+        <li>
+          <a routerLink="/user">User/Profile</a>
+        </li>      
+        <li>
+          <a routerLink="/home">Notification</a>
+        </li>
+        <li>
+            <a styele="cursor: pointer;" (click)="onSignOut()">Sign Out</a>
+        </li>
+      </ng-template>
+      <ng-template [ngIf]="!authService.isAuthenticated()">
+        <li>
+            <a routerLink="/signup">Signup</a>
+        </li>
+        <li>
+            <a routerLink="/signin">Signin</a>
+        </li>
+      </ng-template>
       <li class="dropdown">
         <a href="#" class="dropdown-toggle" role="button">Admin
           <span class="caret"></span>
