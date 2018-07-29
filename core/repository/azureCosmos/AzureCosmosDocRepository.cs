@@ -45,19 +45,36 @@ namespace core.repository.azureCosmos
 
         public async Task<T> GetAsync<T>(string id, FeedOptions options)
         {
-            var res = await this.client.ReadDocumentAsync(UriFactory.CreateDocumentUri(databaseName, this.collectionName, id));
-            return (dynamic)res.Resource;
+            try
+            {
+                var res = await this.client.ReadDocumentAsync(UriFactory.CreateDocumentUri(databaseName, this.collectionName, id));
+                return (dynamic)res.Resource;
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine("AzureCosmosDocRepository:GetAsync Error: {0}", ex.Message);
+                throw;
+            } 
         }
 
         public async Task<T> CreateAsync<T>(T doc, FeedOptions options)
         {
-            var res =  await this.client.CreateDocumentAsync(UriFactory.CreateDocumentCollectionUri(databaseName, collectionName), doc);
-            return (dynamic)res.Resource;
+            try
+            {
+                var res =  await this.client.CreateDocumentAsync(UriFactory.CreateDocumentCollectionUri(databaseName, collectionName), doc);
+                return (dynamic)res.Resource;
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine("AzureCosmosDocRepository:CreateAsync Error: {0}", ex.Message);
+                throw;
+            }            
         }
 
         public async Task<T> UpdateAsync<T>(T doc, FeedOptions options) where T : DocumentBase
         {
-            try{
+            try
+            {
                 var existing = await this.client.ReadDocumentAsync(UriFactory.CreateDocumentUri(databaseName, collectionName, doc.Id));   
                 dynamic json = JObject.FromObject(doc);
                 //json.id = doc.Id; //Didn't understand why earlier approach didn't work                
@@ -66,7 +83,7 @@ namespace core.repository.azureCosmos
             }
             catch(Exception ex)
             {
-                Console.WriteLine("Error: {0}", ex.Message);
+                Console.WriteLine("AzureCosmosDocRepository:UpdateAsync Error: {0}", ex.Message);
                 throw;
             }
         }

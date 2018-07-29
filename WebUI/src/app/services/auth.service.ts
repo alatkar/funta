@@ -44,4 +44,8 @@ export class AuthService {
   isAuthenticated() {
     return this.token != null;
   }
+
+  getUserId() {
+    return firebase.auth().currentUser.uid;
+  }
 }

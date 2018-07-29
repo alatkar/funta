@@ -19,7 +19,7 @@ import { RegisterUserComponent } from './user/register-user/register-user.compon
 import { RegisterProfileComponent } from './user/profile/register-profile/register-profile.component';
 import { SignupComponent } from './auth/signup/signup.component';
 import { SigninComponent } from './auth/signin/signin.component';
-import { AuthGuard } from './services/auth-guard.service';
+import { AuthGuardService } from './services/auth-guard.service';
 
 @NgModule({
   declarations: [
@@ -44,15 +44,15 @@ import { AuthGuard } from './services/auth-guard.service';
     RouterModule.forRoot([
       // Routes should be from most specific to general
       // Open URLs
-      { path: '', component: FeedComponent /*HomeComponent*/ , canActivate: [AuthGuard]},
-      { path: 'home', component: FeedComponent /*HomeComponent*/, canActivate: [AuthGuard] },
-      { path: 'post', component: FeedCreateComponent /*HomeComponent*/ , canActivate: [AuthGuard]},
-      { path: 'products', component: FeedComponent , canActivate: [AuthGuard]},
-      { path: 'user', component: UserComponent , canActivate: [AuthGuard]},
-      { path: 'user/:id', component: UserComponent , canActivate: [AuthGuard]},
-      { path: 'profile', component: ProfileComponent , canActivate: [AuthGuard]},
-      { path: 'profile/:id', component: ProfileComponent , canActivate: [AuthGuard]},
-      { path: 'profile/:userName', component: ProfileComponent , canActivate: [AuthGuard]},
+      { path: '', component: FeedComponent /*HomeComponent*/ , canActivate: [AuthGuardService]},
+      { path: 'home', component: FeedComponent /*HomeComponent*/, canActivate: [AuthGuardService] },
+      { path: 'post', component: FeedCreateComponent /*HomeComponent*/ , canActivate: [AuthGuardService]},
+      { path: 'products', component: FeedComponent , canActivate: [AuthGuardService]},
+      { path: 'user', component: UserComponent , canActivate: [AuthGuardService]},
+      { path: 'user/:id', component: UserComponent , canActivate: [AuthGuardService]},
+      { path: 'profile', component: ProfileComponent , canActivate: [AuthGuardService]},
+      { path: 'profile/:id', component: ProfileComponent , canActivate: [AuthGuardService]},
+      { path: 'profile/:userName', component: ProfileComponent , canActivate: [AuthGuardService]},
       { path: 'signup', component: SignupComponent },
       { path: 'signin', component: SigninComponent },
       { path: 'not-found', component: NotFoundComponent },

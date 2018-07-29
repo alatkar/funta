@@ -2,6 +2,7 @@ import { Component, OnInit, ViewChild, ElementRef, Output, EventEmitter } from '
 import { Feed } from 'src/app/models/feed';
 import { NgForm } from '@angular/forms';
 import { FeedService } from 'src/app/services/feed.service';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-feed-create',
@@ -11,7 +12,7 @@ import { FeedService } from 'src/app/services/feed.service';
 export class FeedCreateComponent implements OnInit {
   @Output('newFeed') newFeed = new EventEmitter<Feed>();
 
-  constructor(private feedService: FeedService) { }
+  constructor(private feedService: FeedService, private authService: AuthService) { }
 
   ngOnInit() {
   }
@@ -19,10 +20,10 @@ export class FeedCreateComponent implements OnInit {
   onSubmit(form: NgForm) {
     console.log(form.value.detail);
     console.log(form.value);
-    this.feedService.addNewFeed(
-      new Feed('5', 'admin', form.value.heading, form.value.detail, form.value.imageUrl,
-      form.value.type, null, new Date(), new Date())
-    ).subscribe((resp: Feed ) =>  {console.log('received post respone ', resp); }
+    const newFeed =  new Feed(null, this.authService.getUserId(), form.value.heading, form.value.detail, form.value.imageUrl,
+    form.value.type, null, new Date(), new Date());
+    this.feedService.addNewFeed(newFeed)
+      .subscribe((resp: Feed ) =>  {console.log('received post respone ', resp); }
   );
     form.reset();
     // Hack to validate form. This should happne in Template
