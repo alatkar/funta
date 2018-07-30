@@ -15,7 +15,8 @@ export class RegisterProfileComponent implements OnInit {
   ngOnInit() {
   }
 
-  onSubmit() {
-    console.log(this.form.value);
+  onSubmit(form: NgForm) {
+    this.form = form;
+    console.log(form.value);
   }
 }
