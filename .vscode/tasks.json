@@ -7,7 +7,7 @@
             "type": "process",
             "args": [
                 "build",
-                "${workspaceFolder}/Services/FeedService/FeedService.csproj"
+                "${workspaceFolder}/backend/Services/FeedService/FeedService.csproj"
             ],
             "problemMatcher": "$msCompile"
         }

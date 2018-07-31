@@ -10,9 +10,9 @@
             "request": "launch",
             "preLaunchTask": "build",
             // If you have changed target frameworks, make sure to update the program path.
-            "program": "${workspaceFolder}/Services/FeedService/bin/Debug/netcoreapp2.0/FeedService.dll",
+            "program": "${workspaceFolder}/backend/Services/FeedService/bin/Debug/netcoreapp2.0/FeedService.dll",
             "args": [],
-            "cwd": "${workspaceFolder}/Services/FeedService",
+            "cwd": "${workspaceFolder}/backend/Services/FeedService",
             "stopAtEntry": false,
             "internalConsoleOptions": "openOnSessionStart",
             "launchBrowser": {
@@ -42,5 +42,5 @@
             "request": "attach",
             "processId": "${command:pickProcess}"
         }
-    ,]
+    ]
 }
