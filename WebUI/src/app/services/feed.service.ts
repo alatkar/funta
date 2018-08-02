@@ -41,7 +41,7 @@ export class FeedService {
 
   getFeed(): any {
     const headers = this.getHeaders();
-    return this.feedService.get<Feed[]>('http://localhost:5000/api/feed', {headers: headers});
+    return this.feedService.get<Feed[]>('http://feedservice1.azurewebsites.net/api/feed', {headers: headers});
     /*
       .subscribe((resp: Response) => {
         console.log(resp);
