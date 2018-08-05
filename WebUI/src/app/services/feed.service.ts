@@ -60,7 +60,7 @@ export class FeedService {
     this.newFeed.emit(feed);
 
     const headers = this.getHeaders();
-    return this.feedService.post<Feed>('http://localhost:5000/api/feed', feed, {headers: headers});
+    return this.feedService.post<Feed>('http://feedservice1.azurewebsites.net/api/feed', feed, {headers: headers});
   }
 
   private getHeaders(): HttpHeaders {

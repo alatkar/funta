@@ -1,24 +1,34 @@
-<a 
-    style="cursor: pointer;"
-    href="#" 
-    class="list-group-item clearfix" >      
-    
-    <div class="col-xs-8">
-    <div class="pull-left {{feed.type}}">
-      <h4 class="list-group-item-heading">[{{feed.type}}]: {{feed.data}}</h4>
-      <p class="list-group-item-text">{{feed.data}}</p>
+<div class="feed-container">            
+  <div>
+      <h4>{{feed.heading}} </h4>
+      <a 
+      href="#" 
+      class="pull-right {{feed.type}}">
+      {{feed.userName}}
+      </a> 
+  </div>    
+  <div >
+    <p><img [src]="feed.imageUrl" class="img-circle pull-right"> <a href="#">{{feed.data}}</a></p>    
+    <hr>         
+  </div>
+  <div class="reply-container">
+    <div class="previour-replies">
+      <a href="#" role="button">See previour 11 replier</a>
+    </div>
+    <div>
+        <a 
+        href="#" 
+        class="pull-right {{feed.type}}">
+        {{feed.userName}}
+        </a>
+      <div>{{feed.data}}</div>
     </div>
   </div>
-  <div class="col-xs-4">  
-    <span class="pull-right" *ngIf="feed.imageUrl">
-      <img 
-        [src]="feed.imageUrl" 
-        alt="{{ feed.heading }}" 
-        class="img-responsive"          
-      >          
-    </span>
+  <div>
+      <input class="reply rounded form-control" type="text" placeholder="Reply..." aria-label="Search">
   </div>
-  <br>
+</div>
+  
   <!--
   <i class="fa fa-thumbs-up" style="font-size:24px; color: aqua"></i>
   -->
@@ -30,4 +40,3 @@
   </div>
   <i class="fa fa-cloud" style="font-size:24px;color:darkcyan; padding: 6px;"></i>
   -->
-</a>

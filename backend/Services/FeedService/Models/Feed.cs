@@ -7,6 +7,8 @@ public class Feed : DocumentBase //: FeedService.Models.IFeed
 {
     [JsonProperty("userName")]
     public string UserName { get; set; }
+    [JsonProperty("heading")]
+    public string Heading { get; set; }
     [JsonProperty("data")]
     public string Data { get; set; }
     [JsonProperty("imageUrl")]
