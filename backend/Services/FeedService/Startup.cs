@@ -44,7 +44,7 @@ namespace FeedService
             }
 
             app.UseCors(
-                options => options.WithOrigins("http://funta.azurewebsites.net", "http://localhost:4200").AllowAnyHeader().AllowAnyMethod()
+                options => options.WithOrigins("https://funta.azurewebsites.net", "http://funta.azurewebsites.net", "http://localhost:4200").AllowAnyHeader().AllowAnyMethod()
             );
             app.UseMvc();
         }
