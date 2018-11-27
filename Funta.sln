@@ -31,7 +31,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DataAccess", "DataAccess", 
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Presentation", "Presentation", "{BCB366CF-0149-448F-9DDA-4D14408FE5D9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Funta.Core.WebApi", "Funta.Core.WebApi\Funta.Core.WebApi.csproj", "{D5D7A24D-32E0-450C-8355-E9FFAE47BF1C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Funta.Core.Web.Api", "Funta.Core.WebApi\Funta.Core.Web.Api.csproj", "{D5D7A24D-32E0-450C-8355-E9FFAE47BF1C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

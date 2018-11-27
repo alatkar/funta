@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Funta.Core.WebApi
+namespace Funta.Core.Web.Api
 {
     public class Startup
     {

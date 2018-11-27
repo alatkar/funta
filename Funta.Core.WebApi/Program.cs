@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
-namespace Funta.Core.WebApi
+namespace Funta.Core.Web.Api
 {
     public class Program
     {
