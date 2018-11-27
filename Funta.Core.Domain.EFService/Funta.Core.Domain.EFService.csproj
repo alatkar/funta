@@ -4,4 +4,9 @@
     <TargetFramework>netcoreapp2.1</TargetFramework>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Funta.Core.Helper\Funta.Core.Helper.csproj" />
+    <ProjectReference Include="..\Funta.Core.Infrastructures.DataAccess\Funta.Core.Infrastructures.DataAccess.csproj" />
+  </ItemGroup>
+
 </Project>

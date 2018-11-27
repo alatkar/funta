@@ -1,4 +1,5 @@
 ﻿using Funta.Core.Domain.Entity.Base;
+using Funta.Core.Domain.Entity.Enums;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -15,6 +16,6 @@ namespace Funta.Core.Domain.Entity.Auth
 
         [ForeignKey(nameof(RoleKey))]
         public virtual Roles Role { get; set; }
-        public Guid RoleKey { get; set; }
+        public RolesEnum RoleKey { get; set; }
     }
 }

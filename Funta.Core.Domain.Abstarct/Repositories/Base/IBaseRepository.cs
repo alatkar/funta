@@ -1,4 +1,5 @@
-﻿using Funta.Core.DTO.General;
+﻿using Funta.Core.Domain.Entity.Base;
+using Funta.Core.DTO.General;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -9,21 +10,25 @@ using System.Threading.Tasks;
 
 namespace Funta.Core.Domain.Abstarct.Repositories.Base
 {
-    public interface IBaseRepository<T, Type> where T : class
+    public interface IBaseRepository<TEntity, TDto, Type>
+                            where TEntity : class, IAuditable
+                            where TDto : class
     {
-        Task<T> InsertAsync(T entity);
-        Task<SearchResult<T, BaseSearchParameter>> GetListAsync(BaseSearchParameter searchParameters);
-        Task<SearchResult<T>> GetListAsync();
-        Task<T> FindAsync(Type id);
-        T Find(Type id);
+        Task<TEntity> InsertAsync(TEntity entity);
+        Task<SearchResult<TEntity, BaseSearchParameter>> GetListAsync(BaseSearchParameter searchParameters);
+        Task<SearchResult<TEntity>> GetListAsync();
+        Task<TEntity> FindAsync(Type id);
+        TEntity Find(Type id);
         Task<bool> IsExistAsync(Type id);
         Task<Type> DeleteAsync(Type id);
-        Task RemoveRangeAsync(List<T> items);
-        Task InsertRangeAsync(List<T> items);
-        Task<Type> UpdateAsync(T entity);
-        Task<Type> UpdateRangeAsync(List<T> items);
-        IQueryable<T> GetDbSet(Expression<Func<T, bool>> expression);
-        IQueryable<T> GetAll();
-        DbSet<T> GetDbSet();
+        Task RemoveRangeAsync(List<TEntity> items);
+        Task InsertRangeAsync(List<TEntity> items);
+        Task<Type> UpdateAsync(TEntity entity);
+        Task<Type> UpdateRangeAsync(List<TEntity> items);
+        IQueryable<TEntity> GetDbSet(Expression<Func<TEntity, bool>> expression);
+        IQueryable<TEntity> GetAll();
+        DbSet<TEntity> GetDbSet();
+        string nameCache { get; }
+        void ClearCache();
     }
 }

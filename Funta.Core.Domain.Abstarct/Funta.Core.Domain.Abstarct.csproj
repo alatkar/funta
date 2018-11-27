@@ -9,6 +9,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Funta.Core.Domain.Entity\Funta.Core.Domain.Entity.csproj" />
     <ProjectReference Include="..\Funta.Core.DTO\Funta.Core.DTO.csproj" />
   </ItemGroup>
 

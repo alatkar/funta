@@ -1,4 +1,5 @@
 ﻿using Funta.Core.Domain.Entity.Auth;
+using Funta.Core.Helper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System;
@@ -18,10 +19,11 @@ namespace Funta.Core.Infrastructures.DataAccess.Configurations
             builder.HasOne(z => z.UserToken).WithOne(z => z.User).HasForeignKey<UserToken>(z => z.UserKey).OnDelete(DeleteBehavior.Cascade);
             builder.HasIndex(x => x.UserName).IsUnique();
             builder.Property(x => x.UserName).HasMaxLength(50);
-            builder.HasData(new Users {
-                BirthDay = new DateTime(1986,03,02),
+            builder.HasData(new Users
+            {
+                BirthDay = new DateTime(1986, 03, 02),
                 City = "Tehran",
-                DisplayName ="Milad",
+                DisplayName = "Milad",
                 Email = "milad.jafari@live.com",
                 Family = "Jafari",
                 Id = new Guid("4A7E613D-D2EA-457F-8B13-21F927258192"),
@@ -30,13 +32,13 @@ namespace Funta.Core.Infrastructures.DataAccess.Configurations
                 LastLoggedIn = null,
                 Mobile = "+989022020735",
                 Name = "Milad",
-                Password = "",//123456
-               RegDate = new DateTime(2018, 11, 25, 00, 00, 00),
-               SaltForHashing = "Microsoft",
-               SerialNumber = "4A7E613D-D2EA-457F-8B13-21F927258192",
-               State = "Tehran",
-               UpdateDate = null,
-               UserName = "miladj3"
+                Password = Hash.Create("123456", "Microsoft"),//123456
+                RegDate = new DateTime(2018, 11, 25, 00, 00, 00),
+                SaltForHashing = "Microsoft",
+                SerialNumber = "4A7E613D-D2EA-457F-8B13-21F927258192",
+                State = "Tehran",
+                UpdateDate = null,
+                UserName = "miladj3"
             });
         }
     }

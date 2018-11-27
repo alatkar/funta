@@ -8,18 +8,23 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
+using Z.EntityFramework.Plus;
 
 namespace Funta.Core.Infrastructures.DataAccess.Repositories.Base
 {
-    public abstract class BaseRepository<T, Type> : IBaseRepository<T, Type> where T : BaseEntity<Type>, new()
+    public abstract class BaseRepository<TEntity, TDto,Type> : IBaseRepository<TEntity, TDto, Type>
+                            where  TDto: class
+                            where TEntity :  BaseEntity<Type>, IAuditable, new()
     {
-        protected DbSet<T> _dbSet;
+        protected DbSet<TEntity> _dbSet;
         private readonly IUnitOfWorks _uow;
+
+        public string nameCache => typeof(TEntity).FullName;
 
         protected BaseRepository(IUnitOfWorks uow)
         {
             _uow = uow;
-            _dbSet = _uow.Set<T>();
+            _dbSet = _uow.Set<TEntity>();
         }
 
         public virtual async Task<Type> DeleteAsync(Type id)
@@ -30,21 +35,21 @@ namespace Funta.Core.Infrastructures.DataAccess.Repositories.Base
             return entity.Id;
         }
 
-        public virtual async Task RemoveRangeAsync(List<T> items)
+        public virtual async Task RemoveRangeAsync(List<TEntity> items)
         {
             _dbSet.RemoveRange(items);
             await _uow.SaveChangesAsync();
         }
 
-        public virtual async Task InsertRangeAsync(List<T> items)
+        public virtual async Task InsertRangeAsync(List<TEntity> items)
         {
             _dbSet.AddRange(items);
             await _uow.SaveChangesAsync();
         }
 
-        public virtual async Task<SearchResult<T, BaseSearchParameter>> GetListAsync(BaseSearchParameter searchParameters)
+        public virtual async Task<SearchResult<TEntity, BaseSearchParameter>> GetListAsync(BaseSearchParameter searchParameters)
         {
-            var result = new SearchResult<T, BaseSearchParameter>
+            var result = new SearchResult<TEntity, BaseSearchParameter>
             {
                 SearchParameter = searchParameters
             };
@@ -64,14 +69,14 @@ namespace Funta.Core.Infrastructures.DataAccess.Repositories.Base
             return result;
         }
 
-        public virtual async Task<T> InsertAsync(T entity)
+        public virtual async Task<TEntity> InsertAsync(TEntity entity)
         {
             _dbSet.Add(entity);
             await _uow.SaveChangesAsync();
             return entity;
         }
 
-        public virtual async Task<Type> UpdateAsync(T entity)
+        public virtual async Task<Type> UpdateAsync(TEntity entity)
         {
             var model = await FindAsync(entity.Id);
             if (model == null)
@@ -83,20 +88,20 @@ namespace Funta.Core.Infrastructures.DataAccess.Repositories.Base
             return entity.Id;
         }
 
-        public virtual async Task<T> FindAsync(Type id)
+        public virtual async Task<TEntity> FindAsync(Type id)
         {
             return await _dbSet.FindAsync(id);
         }
 
-        public virtual T Find(Type id)
+        public virtual TEntity Find(Type id)
         {
             return _dbSet.Find(id);
         }
         
 
-        public virtual IQueryable<T> GetDbSet(Expression<Func<T, bool>> expression)
+        public virtual IQueryable<TEntity> GetDbSet(Expression<Func<TEntity, bool>> expression)
         {
-            IQueryable<T> localEntities = _dbSet.AsQueryable();
+            IQueryable<TEntity> localEntities = _dbSet.AsQueryable();
             if (expression != null)
             {
                 localEntities = localEntities.Where(expression);
@@ -104,19 +109,19 @@ namespace Funta.Core.Infrastructures.DataAccess.Repositories.Base
             return localEntities;
         }
 
-        public virtual IQueryable<T> GetAll()
+        public virtual IQueryable<TEntity> GetAll()
         {
             return _dbSet.AsQueryable();
         }
 
-        public virtual DbSet<T> GetDbSet()
+        public virtual DbSet<TEntity> GetDbSet()
         {
             return _dbSet;
         }
 
-        public virtual async Task<SearchResult<T>> GetListAsync()
+        public virtual async Task<SearchResult<TEntity>> GetListAsync()
         {
-            var result = new SearchResult<T>();
+            var result = new SearchResult<TEntity>();
             var query = _dbSet.AsNoTracking().OrderByDescending(c => c.Id).AsQueryable();
 
             result.Result = await query.ToListAsync();
@@ -128,11 +133,14 @@ namespace Funta.Core.Infrastructures.DataAccess.Repositories.Base
             return await _dbSet.AnyAsync(x => x.Id.Equals(id));
         }
 
-        public async Task<Type> UpdateRangeAsync(List<T> items)
+        public async Task<Type> UpdateRangeAsync(List<TEntity> items)
         {
             _dbSet.UpdateRange(items);
             await _uow.SaveChangesAsync();
             return default(Type);
         }
+
+        public void ClearCache() =>
+           QueryCacheManager.ExpireTag(this.nameCache);
     }
 }

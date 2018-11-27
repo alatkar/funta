@@ -8,7 +8,7 @@ using System.Text;
 namespace Funta.Core.DTO.User
 {
     [DataContract]
-    public class LoginDto
+    public class LoginUserDto
     {
         private const string Pattern = @"^((\+۹|\+۹۸۹|\+\+۹۸۹|۹|۰۹|۹۸۹|۰۹۸۹|۰۰۹۸۹)(۰۱|۰۲|۰۳|۱۰|۱۱|۱۲|۱۳|۱۴|۱۵|۱۶|۱۷|۱۸|۱۹|۲۰|۲۱|۲۲|۳۰|۳۱|۳۲|۳۳|۳۴|۳۵|۳۶|۳۷|۳۸|۳۹|۹۰))(\d{۷})$";
 

@@ -16,14 +16,14 @@ namespace Funta.Core.Infrastructures.DataAccess.Configurations
             builder.HasData(new List<Roles> {
                 new Roles
                 {
-                    Id = new Guid("7CEE6CCA-A8A2-42EC-AA2B-EE10AA9230E3"),
+                    Id =  Domain.Entity.Enums.RolesEnum.Admin,
                     IsRemoved = false,
                     Name = "Admin",
                     RegDate = new DateTime(2018, 11, 25)
                 },
                  new Roles
                 {
-                    Id = new Guid("D909755A-0068-4157-BA16-277528C44354"),
+                    Id =  Domain.Entity.Enums.RolesEnum.User,
                     IsRemoved = false,
                     Name = "User",
                     RegDate = new DateTime(2018, 11, 25)
