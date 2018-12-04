@@ -35,7 +35,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Funta.Core.Web.Api", "Funta
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Auth", "Auth", "{296F9B67-4F73-4B4C-B8AC-27753EEDEABA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Funta.Core.Jwt.Layer", "Funta.Core.Jwt.Layer\Funta.Core.Jwt.Layer.csproj", "{2D5093C1-43F4-4027-AA77-028B51977637}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Funta.Core.Jwt.Layer", "Funta.Core.Jwt.Layer\Funta.Core.Jwt.Layer.csproj", "{2D5093C1-43F4-4027-AA77-028B51977637}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Funta.Core.Infrastructures.azureCosmos", "Funta.Core.Infrastructures.azureCosmos\Funta.Core.Infrastructures.azureCosmos.csproj", "{65F81A0E-F98C-41C8-A5BB-21D1536D9DD0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -87,6 +89,10 @@ Global
 		{2D5093C1-43F4-4027-AA77-028B51977637}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2D5093C1-43F4-4027-AA77-028B51977637}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2D5093C1-43F4-4027-AA77-028B51977637}.Release|Any CPU.Build.0 = Release|Any CPU
+		{65F81A0E-F98C-41C8-A5BB-21D1536D9DD0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{65F81A0E-F98C-41C8-A5BB-21D1536D9DD0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{65F81A0E-F98C-41C8-A5BB-21D1536D9DD0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{65F81A0E-F98C-41C8-A5BB-21D1536D9DD0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -102,6 +108,7 @@ Global
 		{BF9474FC-790B-4635-BB4D-C75C8E0686C7} = {04237D3E-A0AD-4DFE-9E49-94CC3F8C85CD}
 		{D5D7A24D-32E0-450C-8355-E9FFAE47BF1C} = {BCB366CF-0149-448F-9DDA-4D14408FE5D9}
 		{2D5093C1-43F4-4027-AA77-028B51977637} = {296F9B67-4F73-4B4C-B8AC-27753EEDEABA}
+		{65F81A0E-F98C-41C8-A5BB-21D1536D9DD0} = {04237D3E-A0AD-4DFE-9E49-94CC3F8C85CD}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {0A3F3270-F239-41F0-96DA-9F9E3C013951}

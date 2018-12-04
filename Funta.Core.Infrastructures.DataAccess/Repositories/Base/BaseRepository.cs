@@ -1,4 +1,5 @@
-﻿using Funta.Core.Domain.Abstarct.Repositories.Base;
+﻿using AutoMapper;
+using Funta.Core.Domain.Abstarct.Repositories.Base;
 using Funta.Core.Domain.Entity.Base;
 using Funta.Core.DTO.General;
 using Microsoft.EntityFrameworkCore;
@@ -69,9 +70,10 @@ namespace Funta.Core.Infrastructures.DataAccess.Repositories.Base
             return result;
         }
 
-        public virtual async Task<TEntity> InsertAsync(TEntity entity)
+        public virtual async Task<TDto> InsertAsync(TDto entity)
         {
-            _dbSet.Add(entity);
+            var model = Mapper.Map<TEntity>(entity);
+            _dbSet.Add(model);
             await _uow.SaveChangesAsync();
             return entity;
         }
@@ -88,9 +90,10 @@ namespace Funta.Core.Infrastructures.DataAccess.Repositories.Base
             return entity.Id;
         }
 
-        public virtual async Task<TEntity> FindAsync(Type id)
+        public virtual async Task<TDto> FindAsync(Type id)
         {
-            return await _dbSet.FindAsync(id);
+            var model =   await _dbSet.FindAsync(id);
+            return Mapper.Map<TDto>(model);
         }
 
         public virtual TEntity Find(Type id)

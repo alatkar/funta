@@ -14,10 +14,10 @@ namespace Funta.Core.Domain.Abstarct.Repositories.Base
                             where TEntity : class, IAuditable
                             where TDto : class
     {
-        Task<TEntity> InsertAsync(TEntity entity);
+        Task<TDto> InsertAsync(TDto entity);
         Task<SearchResult<TEntity, BaseSearchParameter>> GetListAsync(BaseSearchParameter searchParameters);
         Task<SearchResult<TEntity>> GetListAsync();
-        Task<TEntity> FindAsync(Type id);
+        Task<TDto> FindAsync(Type id);
         TEntity Find(Type id);
         Task<bool> IsExistAsync(Type id);
         Task<Type> DeleteAsync(Type id);

@@ -5,6 +5,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="8.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Funta.Core.Helper\Funta.Core.Helper.csproj" />
     <ProjectReference Include="..\Funta.Core.Infrastructures.DataAccess\Funta.Core.Infrastructures.DataAccess.csproj" />
   </ItemGroup>
