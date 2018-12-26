@@ -18,7 +18,7 @@ export class UserService {
 
     return new User('1', 'admin', 'Admin', 'Funta',
     'https://www.maxpixel.net/static/photo/1x/Sweet-Grass-Nice-Dog-Brown-Bitch-Dogs-Sun-2679538.jpg',
-      new Address(), profiles, new Date('04/04/2018'));
+      new Address('line1', 'line2', 'city', 'country', 'zipcode'), profiles, new Date('04/04/2018'));
   }
 
   getUserByUserName(userName: string) {
@@ -28,7 +28,7 @@ export class UserService {
 
     return new User('1', 'admin', 'Admin', 'Funta',
       'https://www.maxpixel.net/static/photo/1x/Sweet-Grass-Nice-Dog-Brown-Bitch-Dogs-Sun-2679538.jpg',
-      new Address(), profiles, new Date('04/04/2018'));
+      new Address('line1', 'line2', 'city', 'country', 'zipcode'), profiles, new Date('04/04/2018'));
   }
 
   getProfileById(id: string) {

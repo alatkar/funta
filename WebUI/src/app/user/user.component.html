@@ -11,9 +11,14 @@
             style="max-height: 50px;"      
           >          
         </span>
-        <h2>User Name: {{user.userName}}</h2>
-        <h3>Name: {{user.firstName}} {{user.lastName}}</h3>
-        <h4>Date Registered: {{user.dateRegistereded}}</h4>
+        <h4>User Name: {{user.userName}}</h4>
+        <h4>Name: {{user.firstName}} {{user.lastName}}</h4>
+        <h4>Date Registered: {{user.dateRegistereded | date: 'dd/MM/yyyy'}}</h4>
+        <span *ngIf="user.address">
+            <h4>Address : {{user.address.line1}} {{user.address.line2}} <br/>
+                          {{user.address.city}}  {{user.address.country}} {{user.address.zipCode}}
+            </h4>
+        </span>
       </a>
     </div>
   </div>  
@@ -38,4 +43,3 @@
     </div>
   </div>
 </div>
-<app-register-user></app-register-user>
