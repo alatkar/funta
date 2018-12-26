@@ -18,6 +18,6 @@ namespace core.repository
 
          Task<IList<T>> QueryAsync<T>(string filter, FeedOptions options);
 
-         Task<T> CreateFeedIfNotExists<T>(T doc, FeedOptions options) where T : DocumentBase;
+         Task<T> CreateIfNotExists<T>(T doc, FeedOptions options) where T : DocumentBase;
     }
 }

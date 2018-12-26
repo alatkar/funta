@@ -6,21 +6,37 @@ namespace core
     {
         private static Container container = null;
 
-        private Container(IRepository repo)
-        {
-            this.repo = repo;
-        }
-        public IRepository repo  { get; }
+        // Clients
 
-        public static void CreateContainer(IRepository repo)
+        //Repositories
+        public IRepository feedRepo { get; set; }
+        public IRepository profileRepo { get; set; }
+        public IRepository userRepo { get; set; }
+
+        private static Container instance = null;
+
+        private static readonly object padlock = new object();
+
+        private Container()
         {
-            Container.container = new Container(repo);
         }
 
-        public static Container FromContainer()
+        public static Container Instance
         {
-            return container;
+            get
+            {
+                if (instance == null)
+                {
+                    lock (padlock)
+                    {
+                        if (instance == null)
+                        {
+                            instance = new Container();
+                        }
+                    }
+                }
+                return instance;
+            }
         }
-
     }
 }

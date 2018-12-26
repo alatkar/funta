@@ -51,3 +51,4 @@ backend/.vs
 
 # Project Additional files
 **/*csproj.user
+/backend/packages

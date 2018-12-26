@@ -106,7 +106,7 @@ namespace core.repository.azureCosmos
             await this.client.DeleteDocumentAsync(existing.Resource.SelfLink);
         }
 
-        public async Task<T> CreateFeedIfNotExists<T>(T doc, FeedOptions options) where T : DocumentBase
+        public async Task<T> CreateIfNotExists<T>(T doc, FeedOptions options) where T : DocumentBase
         {
             try
             {

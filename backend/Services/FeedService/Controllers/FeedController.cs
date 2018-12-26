@@ -1,20 +1,11 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Net.Http;
 using System.Threading.Tasks;
 using core;
 using core.repository;
-using core.repository.azureCosmos;
-using FeedService.Models;
-using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Documents;
 using Microsoft.Azure.Documents.Client;
-using Microsoft.Azure.KeyVault;
-using Microsoft.IdentityModel.Clients.ActiveDirectory;
-using Newtonsoft.Json.Linq;
 
 namespace FeedService.Controllers
 {
@@ -24,11 +15,11 @@ namespace FeedService.Controllers
         DocumentClient client;
         string appid = "b4ea2dba-cf3d-4309-8d6c-d3fe29807232";
 
-        IRepository repo;
-        
+        IRepository feedRepo;
+
         public FeedController()
-        {            
-            this.repo = Container.FromContainer().repo;
+        {
+            this.feedRepo = Container.Instance.feedRepo;
         }
 
         [HttpGet]
@@ -36,7 +27,7 @@ namespace FeedService.Controllers
         {
             try
             {
-                IList<Feed> feeds = await repo.QueryAsync<Feed>("", null);
+                IList<Feed> feeds = await feedRepo.QueryAsync<Feed>("", null);
                 return feeds;
             }
             catch (DocumentClientException de)
@@ -57,7 +48,7 @@ namespace FeedService.Controllers
         {
             try
             {
-                var res = await repo.GetAsync<Feed>(id, null);
+                var res = await feedRepo.GetAsync<Feed>(id, null);
                 return res;
             }
             catch (DocumentClientException de)
@@ -79,7 +70,7 @@ namespace FeedService.Controllers
         {
             try
             {
-                var result = await repo.CreateAsync(doc, null);    
+                var result = await feedRepo.CreateAsync(doc, null);    
                 Feed fd = (dynamic)result;
                 return fd;                
             }
@@ -101,7 +92,7 @@ namespace FeedService.Controllers
         {
             try
             {
-                var result = await repo.UpdateAsync(doc, null);    
+                var result = await feedRepo.UpdateAsync(doc, null);    
                 Feed fd = (dynamic)result;
                 return fd;                
             }
@@ -121,7 +112,7 @@ namespace FeedService.Controllers
         [HttpDelete("{id}")]
         public async Task DeleteAsync(string id) //TODO: Figure out how to send error codes instead of 500
         {            
-            await repo.DeleteAsync(id, null); 
+            await feedRepo.DeleteAsync(id, null); 
             /*
             try
             {
