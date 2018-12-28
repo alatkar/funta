@@ -1,8 +1,7 @@
-import { Subscription } from 'rxjs';
+import { Subscription ,  Subscribable } from 'rxjs';
 import { OnDestroy } from '@angular/core/src/metadata/lifecycle_hooks';
 import { ActivatedRoute, Params } from '@angular/router';
 import { Component, OnInit, Input } from '@angular/core';
-import { Subscribable } from 'rxjs';
 import { Profile } from 'src/app/models/profile';
 
 @Component({
