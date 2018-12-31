@@ -54,6 +54,7 @@ namespace MainService
         {
             var token = authorization.GetToken().Result;
             Container.Instance.feedRepo = AzureCosmosDocRepository.CreateAzureCosmosDocRepository("FeedCollection", token).Result;
+            Container.Instance.userRepo = AzureCosmosDocRepository.CreateAzureCosmosDocRepository("UserCollection", token).Result;
         }
     }
 }

@@ -12,6 +12,9 @@ namespace core.repository.azureCosmos
         [JsonProperty("_etag")]
         public string ETag { get; }
 
+        [JsonProperty("isActive")]
+        public string IsActive { get; }
+
         public override string ToString()
         {
             return JsonConvert.SerializeObject(this);

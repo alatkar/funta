@@ -23,7 +23,7 @@ namespace MainService.Controllers
 
         // GET: api/<controller>
         [HttpGet]
-        public async Task<ActionResult<IList<Feed>>> Get()
+        public async Task<ActionResult> Get()
         {
             try
             {
@@ -53,7 +53,7 @@ namespace MainService.Controllers
 
         // GET api/<controller>/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Feed>> Get(string id)
+        public async Task<ActionResult> Get(string id)
         {
             try
             {
@@ -126,9 +126,10 @@ namespace MainService.Controllers
 
         // DELETE api/<controller>/5
         [HttpDelete("{id}")]
-        public async Task Delete(string id)
+        public async Task<ActionResult> Delete(string id)
         {
             await feedRepo.DeleteAsync(id, null);
+            return Ok();
             /*
             try
             {
