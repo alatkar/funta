@@ -16,10 +16,10 @@ export class FeedComponent implements OnInit {
    }
 
   ngOnInit() {
-    this.feedService.getFeed().subscribe((data: Feed[]) => {
+    this.feedService.getFeed().subscribe((data: any/*Figure out elegent way*/) => {
       console.log(data);
       const temp = data;
-      this.feeds = data; // {...data.body};
+      this.feeds = data.value; // {...data.body};
     });
     this.feedService.newFeed.subscribe(
       (feed: Feed)  => {
