@@ -1,11 +1,8 @@
 ﻿using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace MainService.Models
 {
+    [JsonObject]
     public class Address
     {
         [JsonProperty("line1")]
@@ -17,6 +14,6 @@ namespace MainService.Models
         [JsonProperty("country")]
         public string Country { get; set; }
         [JsonProperty("zipCode")]
-        public FeedTypes ZipCode { get; set; }
+        public string ZipCode { get; set; }
     }
 }
