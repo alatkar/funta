@@ -1,6 +1,9 @@
 import { Router } from '@angular/router';
 import { Injectable } from '@angular/core';
 import * as firebase from 'firebase';
+import { Login } from '../models/login';
+import { HttpHeaders, HttpClient } from '@angular/common/http';
+import { User } from '../models/user';
 
 @Injectable({
   providedIn: 'root'
@@ -8,7 +11,21 @@ import * as firebase from 'firebase';
 export class AuthService {
 
   token: string;
-  constructor(private router: Router) { }
+  user: User[] = [];
+  constructor(private router: Router, private service: HttpClient) {
+    this.token = null;
+   }
+
+  login(login: Login) {
+    this.service.post<Login>('https://localhost:44344/api/account/LoginAsync', login).toPromise()
+    .then(
+    resp => {
+      console.log('AuthService:signIn success' + resp);
+      this.router.navigate(['/']);
+      this.token = login.userName;
+   })
+  .catch(error => console.log('AuthService:signIn failed ' + error));
+  }
 
   signUp(email: string, password: string) {
     firebase.auth().createUserWithEmailAndPassword(email, password)
@@ -35,17 +52,22 @@ export class AuthService {
   }
 
   getToken() {
-    firebase.auth().currentUser.getIdToken()
-    .then ((token: string) => this.token = token);
-
+    //firebase.auth().currentUser.getIdToken()
+    //.then ((token: string) => this.token = token);
     return this.token;
   }
 
   isAuthenticated() {
-    return this.token != null;
+    return this.token != null && this.token.length > 2;
   }
 
   getUserId() {
     return firebase.auth().currentUser.uid;
+  }
+
+  private getHeaders(): HttpHeaders {
+    const token = this.getToken();
+    return new HttpHeaders().set('Content-Type', 'application/json')
+    .set('authorization', 'Bearer ' + token);
   }
 }
