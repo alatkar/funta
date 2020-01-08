@@ -9,15 +9,25 @@ namespace PartyFindsApi.Models
     [JsonObject]
     public class Address
     {
-        [JsonProperty("line1")]
+        [JsonProperty("line1", Required = Required.Always)]
         public string Line1 { get; set; }
+
         [JsonProperty("line2")]
         public string Line2 { get; set; }
-        [JsonProperty("city")]
+
+        [JsonProperty("city", Required = Required.Always)]
         public string City { get; set; }
-        [JsonProperty("country")]
+
+        [JsonProperty("country", Required = Required.Always)]
         public string Country { get; set; }
-        [JsonProperty("zipCode")]
+
+        [JsonProperty("zipCode", Required = Required.Always)]
         public string ZipCode { get; set; }
+
+        [JsonProperty("latitude")]
+        public string Latitude { get; set; }
+
+        [JsonProperty("longitude")]
+        public string Longitude { get; set; }
     }
 }

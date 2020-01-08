@@ -2,6 +2,8 @@
 //   Copyright (c) PartyFinds LLC.  All rights reserved
 // </copyright>
 
+using Azure.Storage.Blobs;
+
 namespace PartyFindsApi.core
 {
     /// <summary>
@@ -13,7 +15,14 @@ namespace PartyFindsApi.core
     {
         //Repositories
         public IRepository listingsRepo { get; set; }
+
+        public IRepository notificationsRepo { get; set; }
+
+        public IRepository messageRepo { get; set; }
+
         public IRepository userRepo { get; set; }
+
+        public BlobContainerClient uploadsContainer { get; set; }
 
         private static Container instance = null;
 

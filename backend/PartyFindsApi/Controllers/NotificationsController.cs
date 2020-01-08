@@ -1,84 +1,67 @@
-﻿// <copyright company="PartyFinds LLC">
-//   Copyright (c) PartyFinds LLC.  All rights reserved
-// </copyright>
-
-using System;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using PartyFindsApi.core;
-using PartyFindsApi.Models;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Documents;
 using Microsoft.Azure.Documents.Client;
+using PartyFindsApi.core;
+using PartyFindsApi.Models;
 
 namespace PartyFindsApi.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ListingsController : ControllerBase
+    public class NotificationsController : ControllerBase
     {
-        //private readonly ICosmosDbService _cosmosDbService;
-        IRepository listingsRepo;
+        IRepository notificationsRepo;
 
-        public ListingsController()
+        public NotificationsController()
         {
             //_cosmosDbService = cosmosDbService;
-            this.listingsRepo = Container.Instance.listingsRepo;
+            this.notificationsRepo = Container.Instance.notificationsRepo;
         }
 
-
-        // GET: api/Listings
+        // GET: api/Notifications
         [HttpGet]
-        public async Task<IActionResult> GetAsync()
+        public async Task<IActionResult> Get()
         {
-            //return await _cosmosDbService.GetItemsAsync("SELECT * FROM c");
             var feed = new FeedOptions();
             feed.EnableCrossPartitionQuery = true;
 
             try
             {
-                var resp = await listingsRepo.QueryAsync<Listing>("", feed);
+                var resp = await notificationsRepo.QueryAsync<Listing>("", feed);
                 return Ok(resp);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return StatusCode(503, ex);
             }
         }
 
-        // GET: api/Listings/94e70e4-1f9c-48c3-bfc9-272550fe3581
+        // GET: api/Notifications/5
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetAsync(string id)
+        public async Task<IActionResult> Get(int userId)
         {
-            
-            var feed = new FeedOptions();
-            feed.EnableCrossPartitionQuery = true;
-
             try
             {
-                //TODO: Need to figure out partitioning strategy
-                var resp = await listingsRepo.QueryAsync<Listing>($" where C.id = '{id}'", feed);
-                //var resp = await listingsRepo.GetAsync<Listings>(id, feed);
-                if(resp == null || resp.Count == 0)
-                {
-                    return NotFound();
-                }
-
-                return Ok(resp.First());
+                var resp = await notificationsRepo.QueryAsync<Listing>($" where C.userId = '{userId}'", null);
+                return Ok(resp);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return StatusCode(503, ex);
             }
         }
 
-        // POST: api/Listings
-        [HttpPost]
-        public async Task<IActionResult> PostAsync([FromBody] Listing item)
+        [HttpPatch]
+        public async Task<IActionResult> PatchAsync([FromBody]Listing doc)
         {
             try
             {
-                var result = await listingsRepo.CreateAsync(item, null);
+                var result = await notificationsRepo.UpdateAsync(doc, null);
                 Listing fd = (dynamic)result;
                 return Ok(fd);
             }
@@ -96,12 +79,13 @@ namespace PartyFindsApi.Controllers
             }
         }
 
-        [HttpPatch]
-        public async Task<IActionResult> PatchAsync([FromBody]Listing doc)
+        // POST: api/Notifications
+        [HttpPost]
+        public async Task<IActionResult> Post([FromBody] string item)
         {
             try
             {
-                var result = await listingsRepo.UpdateAsync(doc, null);
+                var result = await notificationsRepo.CreateAsync(item, null);
                 Listing fd = (dynamic)result;
                 return Ok(fd);
             }

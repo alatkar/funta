@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Azure.Documents.Client;
 using PartyFindsApi.core;
 
 namespace PartyFindsApi.Controllers
@@ -19,7 +20,7 @@ namespace PartyFindsApi.Controllers
         public LoginController()
         {
             //_cosmosDbService = cosmosDbService;
-            this.userRepo = Container.Instance.listingsRepo;
+            this.userRepo = Container.Instance.userRepo;
         }
 
         //TODO: Token management
@@ -36,10 +37,10 @@ namespace PartyFindsApi.Controllers
 
             if (user == null)
             {
-                return NotFound($"{userInput} is not found");
+                return NotFound($"{userInput.Email} or {userInput.UserName} is not found");
             }
 
-            if (!userInput.PasswordHash.Equals(user.PasswordHash))
+            if (!userInput.Password.Equals(user.Password))
             {
                 return BadRequest($"Password provided for {user} does not match");
             }
@@ -66,29 +67,32 @@ namespace PartyFindsApi.Controllers
         [HttpPost]
         public async Task<IActionResult> RegisterAsync([FromBody]Models.Account user)
         {
-            if (string.IsNullOrEmpty(user.UserName))
-            {
-                return BadRequest($"Username or Email not provided");
-            }
-
             if (string.IsNullOrEmpty(user.Email))
             {
-                return BadRequest($"Username or Email not provided");
+                return BadRequest($"Email not provided");
             }
 
-            if (string.IsNullOrEmpty(user.PasswordHash))
+            if (string.IsNullOrEmpty(user.Password))
             {
                 return BadRequest($"Password not provided");
             }
 
-            IList<Models.User> users = await userRepo.QueryAsync<Models.User>($" c where c.userName = '{user.UserName}'", null);
+            IList<Models.User> users = null;
 
-            if (users != null && users.Count > 0)
+            var feed = new FeedOptions();
+            feed.EnableCrossPartitionQuery = true;
+
+            if (!string.IsNullOrEmpty(user.UserName))
             {
-                return BadRequest($"User {user.UserName} already exists");
-            }
+                users = await userRepo.QueryAsync<Models.User>($" where C.userName = '{user.UserName}'", feed);
 
-            users = await userRepo.QueryAsync<Models.User>($" c where c.email = '{user.Email}'", null);
+                if (users != null && users.Count > 0)
+                {
+                    return BadRequest($"User {user.UserName} already exists");
+                }
+            }            
+
+            users = await userRepo.QueryAsync<Models.User>($" where C.email = '{user.Email}'", feed);
 
             if (users != null && users.Count > 0)
             {
@@ -113,15 +117,18 @@ namespace PartyFindsApi.Controllers
             return Ok(new string[] { "ResetPasswordAsync:username", "ResetPasswordAsync:password" });
         }
 
-        // QUery by Username or email
+        // Query by Username or email
         async Task<Models.User> QueryUser(string userName, string email)
         {
+            var feed = new FeedOptions();
+            feed.EnableCrossPartitionQuery = true;
+
             string filter = "";
             IList<Models.User> users = null;
             if (!string.IsNullOrWhiteSpace(userName))
             {
                 filter = $" c where c.userName = '{userName}'";
-                users = await userRepo.QueryAsync<Models.User>(filter, null);
+                users = await userRepo.QueryAsync<Models.User>(filter, feed);
             }
             
             if (users == null || users.Count == 0)
@@ -129,8 +136,8 @@ namespace PartyFindsApi.Controllers
                 filter = "";
                 if (!string.IsNullOrWhiteSpace(email))
                 {
-                    filter = $" c where c.email = '{email}'";
-                    users = await userRepo.QueryAsync<Models.User>(filter, null);
+                    filter = $" where C.email = '{email}'";
+                    users = await userRepo.QueryAsync<Models.User>(filter, feed);
                 }
             }
 
