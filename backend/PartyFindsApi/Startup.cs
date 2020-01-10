@@ -15,18 +15,14 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Clients.ActiveDirectory;
 using Microsoft.OpenApi.Models;
 using Azure.Storage.Blobs;
-using System.Configuration;
 
 namespace PartyFindsApi
 {
     public class Startup
     {
-        public static IConfiguration StaticConfig { get; private set; }
-
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
-            StaticConfig = configuration;
         }
 
         public IConfiguration Configuration { get; }
@@ -58,7 +54,6 @@ namespace PartyFindsApi
 
         public static async Task<string> GetToken()
         {
-            var val = ConfigurationManager.AppSettings["CosmosDb"];
             var kv = new KeyVaultClient(new KeyVaultClient.AuthenticationCallback(GetToken));
             var dbKey = await kv.GetSecretAsync("https://funta.vault.azure.net/secrets/funtadb-key/bd0f813ed8c341ccb3b0baf2eb82bc46");
             return dbKey.Value;
@@ -94,11 +89,6 @@ namespace PartyFindsApi
                 endpoints.MapControllers();
             });
 
-            var str = this.Configuration.ToString();
-            var val = this.Configuration.GetValue<string>("CosmosDb:Key");
-            val = this.Configuration["CosmosDb:Key"];
-            val = this.Configuration["ASPNETCORE_ENVIRONMENT"];
-
             var token = Startup.GetToken().Result;
             core.Container.Instance.listingsRepo = AzureCosmosDocRepository.CreateAzureCosmosDocRepository("Listings", token).Result;
             core.Container.Instance.messageRepo = AzureCosmosDocRepository.CreateAzureCosmosDocRepository("Messages", token).Result;
@@ -109,7 +99,7 @@ namespace PartyFindsApi
             BlobServiceClient blobServiceClient = new BlobServiceClient("DefaultEndpointsProtocol=https;AccountName=partyfindsstoragedev;AccountKey=h/4vuXYt3pKpfale7MAkH4nsvVVpCi+8TyLgmxzSeRUEkcbJc5BBp7jQvn8biARUJ7GSMNpW4EJ8rHoDYIygYw==;EndpointSuffix=core.windows.net");
             core.Container.Instance.uploadsContainer = blobServiceClient.GetBlobContainerClient("uploads");
         }
-        /*
+
         /// <summary>
         /// Creates a Cosmos DB database and a container with the specified partition key. 
         /// </summary>
@@ -129,6 +119,6 @@ namespace PartyFindsApi
             await database.Database.CreateContainerIfNotExistsAsync(containerName, "/id");
 
             return cosmosDbService;
-        }  */      
+        }
     }
 }

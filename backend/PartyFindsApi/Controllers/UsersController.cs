@@ -6,9 +6,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using JsonApiSerializer;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Documents;
 using Microsoft.Azure.Documents.Client;
+using Newtonsoft.Json;
 using PartyFindsApi.core;
 using PartyFindsApi.Models;
 
@@ -35,7 +37,7 @@ namespace PartyFindsApi.Controllers
             try
             {
                 var resp = await userRepo.QueryAsync<Listing>("", feed);
-                return Ok(resp);
+                return Ok(JsonConvert.SerializeObject(resp, new JsonApiSerializerSettings()));
             }
             catch (Exception ex)
             {
@@ -57,7 +59,7 @@ namespace PartyFindsApi.Controllers
                     return NotFound();
                 }
 
-                return Ok(resp.First());
+                return Ok(JsonConvert.SerializeObject(resp.First(), new JsonApiSerializerSettings()));
             }
             catch (Exception ex)
             {
@@ -73,8 +75,8 @@ namespace PartyFindsApi.Controllers
                 var feed = new FeedOptions();
                 feed.PartitionKey = new PartitionKey(doc.Id);
                 var result = await userRepo.UpdateAsync(doc, feed);
-                Models.User fd = (dynamic)result;
-                return Ok(fd);
+                Models.User resp = (dynamic)result;
+                return Ok(JsonConvert.SerializeObject(resp, new JsonApiSerializerSettings()));
             }
             catch (DocumentClientException de)
             {

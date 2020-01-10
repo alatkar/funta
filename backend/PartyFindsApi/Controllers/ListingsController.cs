@@ -10,6 +10,8 @@ using PartyFindsApi.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Documents;
 using Microsoft.Azure.Documents.Client;
+using Newtonsoft.Json;
+using JsonApiSerializer;
 
 namespace PartyFindsApi.Controllers
 {
@@ -38,7 +40,7 @@ namespace PartyFindsApi.Controllers
             try
             {
                 var resp = await listingsRepo.QueryAsync<Listing>("", feed);
-                return Ok(resp);
+                return Ok(JsonConvert.SerializeObject(resp, new JsonApiSerializerSettings()));
             }
             catch(Exception ex)
             {
@@ -64,7 +66,7 @@ namespace PartyFindsApi.Controllers
                     return NotFound();
                 }
 
-                return Ok(resp.First());
+                return Ok(JsonConvert.SerializeObject(resp.First(), new JsonApiSerializerSettings()));
             }
             catch(Exception ex)
             {
@@ -80,7 +82,7 @@ namespace PartyFindsApi.Controllers
             {
                 var result = await listingsRepo.CreateAsync(item, null);
                 Listing fd = (dynamic)result;
-                return Ok(fd);
+                return Ok(JsonConvert.SerializeObject(fd, new JsonApiSerializerSettings()));
             }
             catch (DocumentClientException de)
             {
@@ -103,7 +105,7 @@ namespace PartyFindsApi.Controllers
             {
                 var result = await listingsRepo.UpdateAsync(doc, null);
                 Listing fd = (dynamic)result;
-                return Ok(fd);
+                return Ok(JsonConvert.SerializeObject(fd, new JsonApiSerializerSettings()));
             }
             catch (DocumentClientException de)
             {

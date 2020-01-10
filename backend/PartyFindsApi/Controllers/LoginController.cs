@@ -6,8 +6,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using JsonApiSerializer;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Documents.Client;
+using Newtonsoft.Json;
 using PartyFindsApi.core;
 
 namespace PartyFindsApi.Controllers
@@ -45,7 +47,7 @@ namespace PartyFindsApi.Controllers
                 return BadRequest($"Password provided for {user} does not match");
             }
 
-            return Ok(user);
+            return Ok(JsonConvert.SerializeObject(user, new JsonApiSerializerSettings()));
         }
         
         //TODO: Token management
@@ -60,7 +62,7 @@ namespace PartyFindsApi.Controllers
                 return NotFound($"{user.UserName} is not found");
             }
 
-            return Ok(registeredUser);
+            return Ok(JsonConvert.SerializeObject(registeredUser, new JsonApiSerializerSettings()));
         }
 
         [Route("api/register")]
@@ -102,7 +104,7 @@ namespace PartyFindsApi.Controllers
             try
             {
                 Models.Account result = await userRepo.CreateAsync(user, null);
-                return Ok(result);
+                return Ok(JsonConvert.SerializeObject(result, new JsonApiSerializerSettings()));
             }
             catch (Exception ex)
             {

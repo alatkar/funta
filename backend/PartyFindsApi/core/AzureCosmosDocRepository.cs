@@ -19,7 +19,7 @@ namespace PartyFindsApi.core
     public class AzureCosmosDocRepository : IRepository
     {
         DocumentClient client;
-        static string databaseName = Startup.StaticConfig["CosmosDb:Db"];
+        static string databaseName = "PartyFinds";
 
         public string collectionName { get; }
 
@@ -150,7 +150,7 @@ namespace PartyFindsApi.core
         static async Task<DocumentClient> GetDocumentClient()
         {
             var kv = new KeyVaultClient(new KeyVaultClient.AuthenticationCallback(GetToken));
-            var dbKey = await kv.GetSecretAsync($"{Startup.StaticConfig["CosmosDb:Db"]}/{Startup.StaticConfig["CosmosDb:DbSecretKey"]}");
+            var dbKey = await kv.GetSecretAsync("https://funta.vault.azure.net/secrets/funtadb-key/bd0f813ed8c341ccb3b0baf2eb82bc46");
 
             string EndpointUri = "https://funtadb.documents.azure.com:443/";
             var client = new DocumentClient(new Uri(EndpointUri), dbKey.Value);

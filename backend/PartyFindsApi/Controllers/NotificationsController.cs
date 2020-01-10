@@ -2,10 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using JsonApiSerializer;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Documents;
 using Microsoft.Azure.Documents.Client;
+using Newtonsoft.Json;
 using PartyFindsApi.core;
 using PartyFindsApi.Models;
 
@@ -33,7 +35,7 @@ namespace PartyFindsApi.Controllers
             try
             {
                 var resp = await notificationsRepo.QueryAsync<Listing>("", feed);
-                return Ok(resp);
+                return Ok(JsonConvert.SerializeObject(resp, new JsonApiSerializerSettings()));
             }
             catch (Exception ex)
             {
@@ -48,7 +50,7 @@ namespace PartyFindsApi.Controllers
             try
             {
                 var resp = await notificationsRepo.QueryAsync<Listing>($" where C.userId = '{userId}'", null);
-                return Ok(resp);
+                return Ok(JsonConvert.SerializeObject(resp, new JsonApiSerializerSettings()));
             }
             catch (Exception ex)
             {
@@ -62,8 +64,8 @@ namespace PartyFindsApi.Controllers
             try
             {
                 var result = await notificationsRepo.UpdateAsync(doc, null);
-                Listing fd = (dynamic)result;
-                return Ok(fd);
+                Listing resp = (dynamic)result;
+                return Ok(JsonConvert.SerializeObject(resp, new JsonApiSerializerSettings()));
             }
             catch (DocumentClientException de)
             {
@@ -86,8 +88,8 @@ namespace PartyFindsApi.Controllers
             try
             {
                 var result = await notificationsRepo.CreateAsync(item, null);
-                Listing fd = (dynamic)result;
-                return Ok(fd);
+                Listing resp = (dynamic)result;
+                return Ok(JsonConvert.SerializeObject(resp, new JsonApiSerializerSettings()));
             }
             catch (DocumentClientException de)
             {

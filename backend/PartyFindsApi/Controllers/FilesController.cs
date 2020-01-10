@@ -40,20 +40,18 @@ namespace PartyFindsApi.Controllers
             string path = string.IsNullOrEmpty(resource.UserId) ? "garbage" : $"{resource.UserId}/";
             path = $"{path}{resource.File.FileName}";
 
-            // Get a reference to a blob
-            BlobClient blobClient = this.uploadsContainer.GetBlobClient($"{path}");
-
             try
             {
+                // Get a reference to a blob
+                BlobClient blobClient = this.uploadsContainer.GetBlobClient($"{path}");
                 //TODO: Delete policy if the blob exists
                 await blobClient.UploadAsync(resource.File.OpenReadStream());
+                return Ok($"{blobClient.Uri}");
             }
             catch(Exception ex)
             {
                 throw ex;
             }
-
-            return Ok($"{blobClient.Uri}");
         }
 
         // PUT: api/Files/5
