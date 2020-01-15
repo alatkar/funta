@@ -13,7 +13,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Clients.ActiveDirectory;
-
+using Microsoft.OpenApi.Models;
+using Azure.Storage.Blobs;
 
 namespace PartyFindsApi
 {
@@ -30,7 +31,13 @@ namespace PartyFindsApi
         public void ConfigureServices(IServiceCollection services)
         {
             //services.AddSingleton<ICosmosDbService>(InitializeCosmosClientInstanceAsync(Configuration.GetSection("CosmosDb")).GetAwaiter().GetResult());
-            services.AddControllers();
+            services.AddControllers().AddNewtonsoftJson();
+
+            // Register the Swagger generator, defining 1 or more Swagger documents
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "API", Version = "v1" });
+            });
         }
 
         static async Task<string> GetToken(string authority /*= "https://login.windows.net/alatkaryahoo.onmicrosoft.com"*/,
@@ -55,6 +62,17 @@ namespace PartyFindsApi
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            // Enable middleware to serve generated Swagger as a JSON endpoint.
+            app.UseSwagger();
+
+            // Enable middleware to serve swagger-ui (HTML, JS, CSS, etc.),
+            // specifying the Swagger JSON endpoint.
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("./swagger/swagger.json", "API");
+                c.RoutePrefix = string.Empty;
+            });
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -73,7 +91,13 @@ namespace PartyFindsApi
 
             var token = Startup.GetToken().Result;
             core.Container.Instance.listingsRepo = AzureCosmosDocRepository.CreateAzureCosmosDocRepository("Listings", token).Result;
+            core.Container.Instance.messageRepo = AzureCosmosDocRepository.CreateAzureCosmosDocRepository("Messages", token).Result;
+            core.Container.Instance.notificationsRepo = AzureCosmosDocRepository.CreateAzureCosmosDocRepository("Notifications", token).Result;
             core.Container.Instance.userRepo = AzureCosmosDocRepository.CreateAzureCosmosDocRepository("Users", token).Result;
+
+            // TODO: Change this for not to use connection string
+            BlobServiceClient blobServiceClient = new BlobServiceClient("DefaultEndpointsProtocol=https;AccountName=partyfindsstoragedev;AccountKey=h/4vuXYt3pKpfale7MAkH4nsvVVpCi+8TyLgmxzSeRUEkcbJc5BBp7jQvn8biARUJ7GSMNpW4EJ8rHoDYIygYw==;EndpointSuffix=core.windows.net");
+            core.Container.Instance.uploadsContainer = blobServiceClient.GetBlobContainerClient("uploads");
         }
 
         /// <summary>
@@ -95,6 +119,6 @@ namespace PartyFindsApi
             await database.Database.CreateContainerIfNotExistsAsync(containerName, "/id");
 
             return cosmosDbService;
-        }        
+        }
     }
 }

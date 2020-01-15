@@ -3,32 +3,27 @@
 // </copyright>
 
 using Newtonsoft.Json;
+using System.Collections.Generic;
 
 namespace PartyFindsApi.Models
 {
     [JsonObject]
     public class User : Account
     {
+        [JsonProperty("firstName")]
+        public string FirstName { get; set; }
+
+        [JsonProperty("lastName")]
+        public string LastName { get; set; }
+
         [JsonProperty("address")]
-        public virtual Address Address { get; set; }
-
-        [JsonProperty("accessFailedCount")]
-        public virtual int AccessFailedCount { get; set; }
-
-        [JsonProperty("emailConfirmed")]
-        public virtual bool EmailConfirmed { get; set; }
-
-        [JsonProperty("imageUrl")]
-        public string ImageUrl { get; set; }
-
-        [JsonProperty("isLocked")]
-        public bool IsLocked { get; set; }
+        public Address Address { get; set; }
 
         [JsonProperty("phoneNumber")]
-        public virtual string PhoneNumber { get; set; }
+        public string PhoneNumber { get; set; }
 
         [JsonProperty("phoneNumberConfirmed")]
-        public virtual bool PhoneNumberConfirmed { get; set; }
+        public bool PhoneNumberConfirmed { get; set; }
 
         public override string ToString()
         {

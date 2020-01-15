@@ -13,9 +13,24 @@ namespace PartyFindsApi.Models
         public string UserName { get; set; }
 
         [JsonProperty(PropertyName = "email", Required = Required.Always)]
-        public virtual string Email { get; set; }
+        public string Email { get; set; }
 
         [JsonProperty(PropertyName = "password", Required = Required.Always)]
-        public virtual string PasswordHash { get; set; }
+        public string Password { get; set; }
+
+        [JsonProperty("accessFailedCount")]
+        public int AccessFailedCount { get; set; }
+
+        [JsonProperty("emailConfirmed")]
+        public bool EmailConfirmed { get; set; }
+
+        [JsonProperty("isAdmin")]
+        public bool IsAdmin { get; set; }
+
+        [JsonProperty("isDeleted")]
+        public bool IsDeleted { get; set; }
+
+        [JsonProperty("isLocked")]
+        public bool IsLocked { get; set; }        
     }
 }

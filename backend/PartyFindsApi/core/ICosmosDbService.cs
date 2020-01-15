@@ -16,10 +16,10 @@ namespace PartyFindsApi.core
 {
     public interface ICosmosDbService: IDisposable
     {
-        Task<IEnumerable<Listings>> GetItemsAsync(string query);
-        Task<Listings> GetItemAsync(string id);
-        Task AddItemAsync(Listings item);
-        Task UpdateItemAsync(string id, Listings item);
+        Task<IEnumerable<Listing>> GetItemsAsync(string query);
+        Task<Listing> GetItemAsync(string id);
+        Task AddItemAsync(Listing item);
+        Task UpdateItemAsync(string id, Listing item);
         Task DeleteItemAsync(string id);
         Task<Container> GetContainer(string id);
     }

@@ -20,6 +20,7 @@ namespace PartyFindsApi.core
     {
         DocumentClient client;
         static string databaseName = "PartyFinds";
+
         public string collectionName { get; }
 
         public static async Task<IRepository> CreateAzureCosmosDocRepository(string collection, string token)
@@ -80,7 +81,8 @@ namespace PartyFindsApi.core
         {
             try
             {
-                var existing = await this.client.ReadDocumentAsync(UriFactory.CreateDocumentUri(databaseName, collectionName, doc.Id));
+                var docUri = UriFactory.CreateDocumentUri(databaseName, collectionName, doc.Id);
+                var existing = await this.client.ReadDocumentAsync(docUri, new RequestOptions { PartitionKey = options.PartitionKey});
                 dynamic json = JObject.FromObject(doc);
                 //json.id = doc.Id; //Didn't understand why earlier approach didn't work                
                 var res = await this.client.ReplaceDocumentAsync(existing.Resource.SelfLink, json);

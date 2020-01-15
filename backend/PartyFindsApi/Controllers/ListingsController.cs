@@ -4,12 +4,16 @@
 
 using System;
 using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
 using PartyFindsApi.core;
 using PartyFindsApi.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Documents;
 using Microsoft.Azure.Documents.Client;
+using Newtonsoft.Json;
+using JsonApiSerializer;
+using Microsoft.AspNetCore.JsonPatch;
 
 namespace PartyFindsApi.Controllers
 {
@@ -31,14 +35,18 @@ namespace PartyFindsApi.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAsync()
         {
+            // TODO: Parse query and pass to repo
+            var query = this.Request.Query;
+            var queryString = this.Request.QueryString;
+
             //return await _cosmosDbService.GetItemsAsync("SELECT * FROM c");
             var feed = new FeedOptions();
             feed.EnableCrossPartitionQuery = true;
 
             try
             {
-                var resp = await listingsRepo.QueryAsync<Listings>("", feed);
-                return Ok(resp);
+                var resp = await listingsRepo.QueryAsync<Listing>("", feed);
+                return Ok(JsonConvert.SerializeObject(resp, new JsonApiSerializerSettings()));
             }
             catch(Exception ex)
             {
@@ -52,19 +60,19 @@ namespace PartyFindsApi.Controllers
         {
             
             var feed = new FeedOptions();
-            feed.EnableCrossPartitionQuery = true;
+            feed.PartitionKey = new PartitionKey(id);
 
             try
             {
                 //TODO: Need to figure out partitioning strategy
-                var resp = await listingsRepo.QueryAsync<Listings>($" where C.id = '{id}'", feed);
+                var resp = await listingsRepo.QueryAsync<Listing>($" where C.id = '{id}'", feed);
                 //var resp = await listingsRepo.GetAsync<Listings>(id, feed);
                 if(resp == null || resp.Count == 0)
                 {
                     return NotFound();
                 }
 
-                return Ok(resp.First());
+                return Ok(JsonConvert.SerializeObject(resp.First(), new JsonApiSerializerSettings()));
             }
             catch(Exception ex)
             {
@@ -74,13 +82,13 @@ namespace PartyFindsApi.Controllers
 
         // POST: api/Listings
         [HttpPost]
-        public async Task<IActionResult> PostAsync([FromBody] Listings item)
+        public async Task<IActionResult> PostAsync([FromBody] Listing item)
         {
             try
             {
                 var result = await listingsRepo.CreateAsync(item, null);
-                Listings fd = (dynamic)result;
-                return Ok(fd);
+                Listing fd = (dynamic)result;
+                return Ok(JsonConvert.SerializeObject(fd, new JsonApiSerializerSettings()));
             }
             catch (DocumentClientException de)
             {
@@ -97,13 +105,32 @@ namespace PartyFindsApi.Controllers
         }
 
         [HttpPatch]
-        public async Task<IActionResult> PatchAsync([FromBody]Listings doc)
+        public async Task<IActionResult> PatchAsync(string id, [FromBody] JsonPatchDocument<Listing> patchDoc)
         {
             try
             {
-                var result = await listingsRepo.UpdateAsync(doc, null);
-                Listings fd = (dynamic)result;
-                return Ok(fd);
+                var feed = new FeedOptions();
+                feed.PartitionKey = new PartitionKey(id);
+                
+                var resp = await listingsRepo.QueryAsync<Listing>($" where C.id = '{id}'", feed);
+
+                var listing =  resp.FirstOrDefault<Listing>();
+
+                if(listing == null)
+                {
+                    return NotFound($"The Listing with id {id} is not found");
+                }
+
+                patchDoc.ApplyTo(listing, ModelState);
+                
+                if(!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
+
+                var result = await listingsRepo.UpdateAsync(listing, feed);
+                Listing fd = (dynamic)result;
+                return Ok(JsonConvert.SerializeObject(fd, new JsonApiSerializerSettings()));
             }
             catch (DocumentClientException de)
             {
@@ -121,7 +148,7 @@ namespace PartyFindsApi.Controllers
 
         // PUT: api/Listings/5
         [HttpPut("{id}")]
-        public IActionResult Put(int id, [FromBody] Listings value)
+        public IActionResult Put(int id, [FromBody] Listing value)
         {
             return StatusCode(501);
         }
