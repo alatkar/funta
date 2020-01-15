@@ -31,7 +31,7 @@ namespace PartyFindsApi
         public void ConfigureServices(IServiceCollection services)
         {
             //services.AddSingleton<ICosmosDbService>(InitializeCosmosClientInstanceAsync(Configuration.GetSection("CosmosDb")).GetAwaiter().GetResult());
-            services.AddControllers();
+            services.AddControllers().AddNewtonsoftJson();
 
             // Register the Swagger generator, defining 1 or more Swagger documents
             services.AddSwaggerGen(c =>

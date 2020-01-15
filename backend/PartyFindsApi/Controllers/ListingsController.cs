@@ -13,6 +13,7 @@ using Microsoft.Azure.Documents;
 using Microsoft.Azure.Documents.Client;
 using Newtonsoft.Json;
 using JsonApiSerializer;
+using Microsoft.AspNetCore.JsonPatch;
 
 namespace PartyFindsApi.Controllers
 {
@@ -59,7 +60,7 @@ namespace PartyFindsApi.Controllers
         {
             
             var feed = new FeedOptions();
-            feed.EnableCrossPartitionQuery = true;
+            feed.PartitionKey = new PartitionKey(id);
 
             try
             {
@@ -104,11 +105,30 @@ namespace PartyFindsApi.Controllers
         }
 
         [HttpPatch]
-        public async Task<IActionResult> PatchAsync([FromBody]Listing doc)
+        public async Task<IActionResult> PatchAsync(string id, [FromBody] JsonPatchDocument<Listing> patchDoc)
         {
             try
             {
-                var result = await listingsRepo.UpdateAsync(doc, null);
+                var feed = new FeedOptions();
+                feed.PartitionKey = new PartitionKey(id);
+                
+                var resp = await listingsRepo.QueryAsync<Listing>($" where C.id = '{id}'", feed);
+
+                var listing =  resp.FirstOrDefault<Listing>();
+
+                if(listing == null)
+                {
+                    return NotFound($"The Listing with id {id} is not found");
+                }
+
+                patchDoc.ApplyTo(listing, ModelState);
+                
+                if(!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
+
+                var result = await listingsRepo.UpdateAsync(listing, feed);
                 Listing fd = (dynamic)result;
                 return Ok(JsonConvert.SerializeObject(fd, new JsonApiSerializerSettings()));
             }
