@@ -4,6 +4,7 @@
 
 using System;
 using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
 using PartyFindsApi.core;
 using PartyFindsApi.Models;
@@ -33,6 +34,10 @@ namespace PartyFindsApi.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAsync()
         {
+            // TODO: Parse query and pass to repo
+            var query = this.Request.Query;
+            var queryString = this.Request.QueryString;
+
             //return await _cosmosDbService.GetItemsAsync("SELECT * FROM c");
             var feed = new FeedOptions();
             feed.EnableCrossPartitionQuery = true;

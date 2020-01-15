@@ -32,5 +32,7 @@ namespace PartyFindsApi.Models
         [JsonProperty("responses")]
         public IList<Message> Responses { get; } = new List<Message>();
 
+        [JsonProperty("isRead")]
+        public bool IsRead { get; set; }
     }
 }
