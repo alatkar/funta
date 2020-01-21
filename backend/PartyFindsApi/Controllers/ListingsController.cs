@@ -40,12 +40,9 @@ namespace PartyFindsApi.Controllers
             var queryString = this.Request.QueryString;
 
             //return await _cosmosDbService.GetItemsAsync("SELECT * FROM c");
-            var feed = new FeedOptions();
-            feed.EnableCrossPartitionQuery = true;
-
             try
             {
-                var resp = await listingsRepo.QueryAsync<Listing>("", feed);
+                var resp = await listingsRepo.QueryAsync<Listing>("", new FeedOptions { EnableCrossPartitionQuery = true });
                 return Ok(JsonConvert.SerializeObject(resp, new JsonApiSerializerSettings()));
             }
             catch(Exception ex)
@@ -57,22 +54,16 @@ namespace PartyFindsApi.Controllers
         // GET: api/Listings/94e70e4-1f9c-48c3-bfc9-272550fe3581
         [HttpGet("{id}")]
         public async Task<IActionResult> GetAsync(string id)
-        {
-            
-            var feed = new FeedOptions();
-            feed.PartitionKey = new PartitionKey(id);
-
+        {            
             try
             {
-                //TODO: Need to figure out partitioning strategy
-                var resp = await listingsRepo.QueryAsync<Listing>($" where C.id = '{id}'", feed);
-                //var resp = await listingsRepo.GetAsync<Listings>(id, feed);
-                if(resp == null || resp.Count == 0)
+                var resp = await listingsRepo.GetAsync<Listing>(id, new RequestOptions { PartitionKey = new PartitionKey(id) });
+                if(resp == null )
                 {
                     return NotFound();
                 }
 
-                return Ok(JsonConvert.SerializeObject(resp.First(), new JsonApiSerializerSettings()));
+                return Ok(JsonConvert.SerializeObject(resp, new JsonApiSerializerSettings()));
             }
             catch(Exception ex)
             {
@@ -86,7 +77,7 @@ namespace PartyFindsApi.Controllers
         {
             try
             {
-                var result = await listingsRepo.CreateAsync(item, null);
+                var result = await listingsRepo.CreateAsync(item, new RequestOptions());
                 Listing fd = (dynamic)result;
                 return Ok(JsonConvert.SerializeObject(fd, new JsonApiSerializerSettings()));
             }
@@ -109,10 +100,7 @@ namespace PartyFindsApi.Controllers
         {
             try
             {
-                var feed = new FeedOptions();
-                feed.PartitionKey = new PartitionKey(id);
-                
-                var resp = await listingsRepo.QueryAsync<Listing>($" where C.id = '{id}'", feed);
+                var resp = await listingsRepo.QueryAsync<Listing>($" where C.id = '{id}'", new FeedOptions { PartitionKey = new PartitionKey(id) });
 
                 var listing =  resp.FirstOrDefault<Listing>();
 
@@ -128,9 +116,9 @@ namespace PartyFindsApi.Controllers
                     return BadRequest(ModelState);
                 }
 
-                var result = await listingsRepo.UpdateAsync(listing, feed);
-                Listing fd = (dynamic)result;
-                return Ok(JsonConvert.SerializeObject(fd, new JsonApiSerializerSettings()));
+                var result = await listingsRepo.UpdateAsync(listing, new RequestOptions { PartitionKey = new PartitionKey(id) });
+                //Listing fd = (dynamic)result;  Do we need this?
+                return Ok(JsonConvert.SerializeObject((dynamic)result, new JsonApiSerializerSettings()));
             }
             catch (DocumentClientException de)
             {

@@ -3,6 +3,7 @@
 // </copyright>
 
 using Newtonsoft.Json;
+using System;
 
 namespace PartyFindsApi.Models
 {
@@ -15,8 +16,15 @@ namespace PartyFindsApi.Models
         [JsonProperty("_etag")]
         public string ETag { get; }
 
+        [Newtonsoft.Json.JsonProperty(PropertyName = "_rid")]
+        public virtual string ResourceId { get; set; }
+
+        //[Newtonsoft.Json.JsonConverter(typeof(Microsoft.Azure.Documents.UnixDateTimeConverter))]
+        [JsonProperty("_ts")]
+        public long _ts { get; }
+
         [JsonProperty("isActive")]
-        public string IsActive { get; }
+        public string IsActive { get; set; }
 
         public override string ToString()
         {

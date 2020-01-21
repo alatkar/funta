@@ -16,7 +16,7 @@ namespace PartyFindsApi.Models
         public string Email { get; set; }
 
         [JsonProperty(PropertyName = "password", Required = Required.Always)]
-        public string Password { get; set; }
+        public string PasswordHash { get; set; }
 
         [JsonProperty("accessFailedCount")]
         public int AccessFailedCount { get; set; }

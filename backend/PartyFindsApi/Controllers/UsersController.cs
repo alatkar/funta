@@ -7,12 +7,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using JsonApiSerializer;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Documents;
 using Microsoft.Azure.Documents.Client;
 using Newtonsoft.Json;
 using PartyFindsApi.core;
 using PartyFindsApi.Models;
+using User = PartyFindsApi.Models.User;
 
 namespace PartyFindsApi.Controllers
 {
@@ -36,7 +38,7 @@ namespace PartyFindsApi.Controllers
 
             try
             {
-                var resp = await userRepo.QueryAsync<Listing>("", feed);
+                var resp = await userRepo.QueryAsync<User>("", feed);
                 return Ok(JsonConvert.SerializeObject(resp, new JsonApiSerializerSettings()));
             }
             catch (Exception ex)
@@ -46,14 +48,14 @@ namespace PartyFindsApi.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> Get(int id)
+        public async Task<IActionResult> Get(string id)
         {
             var feed = new FeedOptions();
             feed.EnableCrossPartitionQuery = true;
 
             try
             {
-                var resp = await userRepo.QueryAsync<Listing>($" where C.id = '{id}'", feed);
+                var resp = await userRepo.QueryAsync<User>($" where C.id = '{id}'", feed);
                 if (resp == null || resp.Count == 0)
                 {
                     return NotFound();
@@ -68,15 +70,29 @@ namespace PartyFindsApi.Controllers
         }
 
         [HttpPatch]
-        public async Task<IActionResult> PatchAsync([FromBody]Models.User doc)
+        public async Task<IActionResult> PatchAsync(string id, [FromBody]JsonPatchDocument<Models.User> patchDoc)
         {
             try
             {
-                var feed = new FeedOptions();
-                feed.PartitionKey = new PartitionKey(doc.Id);
-                var result = await userRepo.UpdateAsync(doc, feed);
-                Models.User resp = (dynamic)result;
-                return Ok(JsonConvert.SerializeObject(resp, new JsonApiSerializerSettings()));
+                var resp = await userRepo.QueryAsync<Models.User>($" where C.id = '{id}'", new FeedOptions { PartitionKey = new PartitionKey(id) });
+
+                var user = resp.FirstOrDefault<Models.User>();
+
+                if (user == null)
+                {
+                    return NotFound($"The user with id {id} is not found");
+                }
+
+                patchDoc.ApplyTo(user, ModelState);
+
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
+
+                var result = await userRepo.UpdateAsync(user, new RequestOptions{ PartitionKey = new PartitionKey(user.Id) });
+                //Models.User respUser = (dynamic)result;
+                return Ok(JsonConvert.SerializeObject((dynamic)result, new JsonApiSerializerSettings()));
             }
             catch (DocumentClientException de)
             {

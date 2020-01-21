@@ -29,8 +29,9 @@ namespace PartyFindsApiUnitTests
             string fileName = "quickstart" + Guid.NewGuid().ToString() + ".txt";
             string localFilePath = Path.Combine(localPath, fileName);
 
+            localFilePath = "C:\\Iphone_2018_Photos\\IMG_7203.jpg";
             // Write text to the file
-            await File.WriteAllTextAsync(localFilePath, "Hello, World!");
+            //await File.WriteAllTextAsync(localFilePath, "Hello, World!");
 
             using FileStream uploadFileStream = File.OpenRead(localFilePath);
             media.File = new FormFile(uploadFileStream, 0, uploadFileStream.Length, "some", string.Empty);

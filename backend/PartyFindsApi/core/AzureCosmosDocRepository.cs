@@ -49,11 +49,11 @@ namespace PartyFindsApi.core
             throw new System.NotImplementedException();
         }
 
-        public async Task<T> GetAsync<T>(string id, FeedOptions options)
+        public async Task<T> GetAsync<T>(string id, RequestOptions options)
         {
             try
             {
-                var res = await this.client.ReadDocumentAsync(UriFactory.CreateDocumentUri(databaseName, this.collectionName, id));
+                var res = await this.client.ReadDocumentAsync(UriFactory.CreateDocumentUri(databaseName, this.collectionName, id), options);
                 return (dynamic)res.Resource;
             }
             catch (Exception ex)
@@ -63,11 +63,11 @@ namespace PartyFindsApi.core
             }
         }
 
-        public async Task<T> CreateAsync<T>(T doc, FeedOptions options)
+        public async Task<T> CreateAsync<T>(T doc, RequestOptions options)
         {
             try
             {
-                var res = await this.client.CreateDocumentAsync(UriFactory.CreateDocumentCollectionUri(databaseName, collectionName), doc);
+                var res = await this.client.CreateDocumentAsync(UriFactory.CreateDocumentCollectionUri(databaseName, collectionName), doc, options);
                 return (dynamic)res.Resource;
             }
             catch (Exception ex)
@@ -77,12 +77,12 @@ namespace PartyFindsApi.core
             }
         }
 
-        public async Task<T> UpdateAsync<T>(T doc, FeedOptions options) where T : DocumentBase
+        public async Task<T> UpdateAsync<T>(T doc, RequestOptions options) where T : DocumentBase
         {
             try
             {
                 var docUri = UriFactory.CreateDocumentUri(databaseName, collectionName, doc.Id);
-                var existing = await this.client.ReadDocumentAsync(docUri, new RequestOptions { PartitionKey = options.PartitionKey});
+                var existing = await this.client.ReadDocumentAsync(docUri, options);
                 dynamic json = JObject.FromObject(doc);
                 //json.id = doc.Id; //Didn't understand why earlier approach didn't work                
                 var res = await this.client.ReplaceDocumentAsync(existing.Resource.SelfLink, json);
@@ -108,10 +108,10 @@ namespace PartyFindsApi.core
             return query;
         }
 
-        public async Task DeleteAsync(string docId, FeedOptions options)
+        public async Task DeleteAsync(string docId, RequestOptions options = null)
         {
             var existing = await this.client.ReadDocumentAsync(UriFactory.CreateDocumentUri(databaseName, collectionName, docId));
-            await this.client.DeleteDocumentAsync(existing.Resource.SelfLink);
+            await this.client.DeleteDocumentAsync(existing.Resource.SelfLink, options);
         }
 
         public async Task<T> CreateIfNotExists<T>(T doc, FeedOptions options) where T : DocumentBase

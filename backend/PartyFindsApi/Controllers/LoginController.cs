@@ -42,7 +42,7 @@ namespace PartyFindsApi.Controllers
                 return NotFound($"{userInput.Email} or {userInput.UserName} is not found");
             }
 
-            if (!userInput.Password.Equals(user.Password))
+            if (!userInput.PasswordHash.Equals(user.PasswordHash))
             {
                 return BadRequest($"Password provided for {user} does not match");
             }
@@ -74,19 +74,17 @@ namespace PartyFindsApi.Controllers
                 return BadRequest($"Email not provided");
             }
 
-            if (string.IsNullOrEmpty(user.Password))
+            if (string.IsNullOrEmpty(user.PasswordHash))
             {
                 return BadRequest($"Password not provided");
             }
 
             IList<Models.User> users = null;
-
-            var feed = new FeedOptions();
-            feed.EnableCrossPartitionQuery = true;
+            var feedOptions = new FeedOptions { EnableCrossPartitionQuery = true };
 
             if (!string.IsNullOrEmpty(user.UserName))
             {
-                users = await userRepo.QueryAsync<Models.User>($" where C.userName = '{user.UserName}'", feed);
+                users = await userRepo.QueryAsync<Models.User>($" where C.userName = '{user.UserName}'", feedOptions);
 
                 if (users != null && users.Count > 0)
                 {
@@ -94,7 +92,7 @@ namespace PartyFindsApi.Controllers
                 }
             }            
 
-            users = await userRepo.QueryAsync<Models.User>($" where C.email = '{user.Email}'", feed);
+            users = await userRepo.QueryAsync<Models.User>($" where C.email = '{user.Email}'", feedOptions);
 
             if (users != null && users.Count > 0)
             {
