@@ -3,17 +3,15 @@
 // </copyright>
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using JsonApiSerializer;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Documents;
 using Microsoft.Azure.Documents.Client;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using PartyFindsApi.core;
-using PartyFindsApi.Models;
 using User = PartyFindsApi.Models.User;
 
 namespace PartyFindsApi.Controllers
@@ -22,10 +20,12 @@ namespace PartyFindsApi.Controllers
     [ApiController]
     public class UsersController : ControllerBase
     {
+        private readonly ILogger logger;
         IRepository userRepo;
 
-        public UsersController()
+        public UsersController(ILogger<UsersController> logger)
         {
+            this.logger = logger;
             //_cosmosDbService = cosmosDbService;
             this.userRepo = Container.Instance.userRepo;
         }
@@ -38,34 +38,39 @@ namespace PartyFindsApi.Controllers
 
             try
             {
-                var resp = await userRepo.QueryAsync<User>("", feed);
+                logger.LogInformation($"Getting Users with query {this.Request.Query} queryString {this.Request.QueryString}");
+                var resp = await userRepo.QueryAsync<User>("", feed).ConfigureAwait(false);
                 return Ok(JsonConvert.SerializeObject(resp, new JsonApiSerializerSettings()));
             }
             catch (Exception ex)
             {
-                return StatusCode(503, ex);
+                logger.LogError($"Received exception {ex}");
+                return StatusCode(500, ex);
             }
         }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(string id)
         {
-            var feed = new FeedOptions();
-            feed.EnableCrossPartitionQuery = true;
+            var feed = new RequestOptions { PartitionKey = new PartitionKey(id) };
+            //feed.EnableCrossPartitionQuery = true;
 
             try
             {
-                var resp = await userRepo.QueryAsync<User>($" where C.id = '{id}'", feed);
-                if (resp == null || resp.Count == 0)
+                logger.LogInformation($"Getting Users with id {id}");
+
+                var resp = await userRepo.GetAsync<User>(id, feed).ConfigureAwait(false);
+                if (resp == null)
                 {
                     return NotFound();
                 }
 
-                return Ok(JsonConvert.SerializeObject(resp.First(), new JsonApiSerializerSettings()));
+                return Ok(JsonConvert.SerializeObject(resp, new JsonApiSerializerSettings()));
             }
             catch (Exception ex)
             {
-                return StatusCode(503, ex);
+                logger.LogError($"Received exception {ex}");
+                return StatusCode(500, ex);
             }
         }
 
@@ -74,9 +79,10 @@ namespace PartyFindsApi.Controllers
         {
             try
             {
-                var resp = await userRepo.QueryAsync<Models.User>($" where C.id = '{id}'", new FeedOptions { PartitionKey = new PartitionKey(id) });
-
-                var user = resp.FirstOrDefault<Models.User>();
+                var user = await userRepo.GetAsync<Models.User>(
+                    id, 
+                    new RequestOptions { PartitionKey = new PartitionKey(id) })
+                    .ConfigureAwait(false);
 
                 if (user == null)
                 {
@@ -90,40 +96,56 @@ namespace PartyFindsApi.Controllers
                     return BadRequest(ModelState);
                 }
 
-                var result = await userRepo.UpdateAsync(user, new RequestOptions{ PartitionKey = new PartitionKey(user.Id) });
+                var result = await userRepo.UpdateAsync(
+                    user, new RequestOptions{ PartitionKey = new PartitionKey(user.Id) }).ConfigureAwait(false);
                 //Models.User respUser = (dynamic)result;
                 return Ok(JsonConvert.SerializeObject((dynamic)result, new JsonApiSerializerSettings()));
             }
-            catch (DocumentClientException de)
+            catch (DocumentClientException ex)
             {
-                Exception baseException = de.GetBaseException();
-                string msg = $"{de.StatusCode} error occurred: {de.Message}, Message: {baseException.Message}";
+                Exception baseException = ex.GetBaseException();
+                string msg = $"{ex.StatusCode} error occurred: {ex.Message}, Message: {baseException.Message}";
+                logger.LogError($"Received exception {ex}");
                 return StatusCode(503, msg);
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                Exception baseException = e.GetBaseException();
-                string msg = $"Error: {e.Message}, Message: {baseException.Message}";
-                return StatusCode(503, msg);
+                logger.LogError($"Received exception {ex}");
+                Exception baseException = ex.GetBaseException();
+                string msg = $"Error: {ex.Message}, Message: {baseException.Message}";
+                return StatusCode(500, msg);
             }
-        }
-
-        [HttpPost]
-        public IActionResult Post([FromBody] string value)
-        {
-            return StatusCode(501);
-        }
-
-        [HttpPut("{id}")]
-        public IActionResult Put(int id, [FromBody] string value)
-        {
-            return StatusCode(501);
         }
 
         [HttpDelete("{id}")]
-        public IActionResult Delete(int id)
+        public async Task<IActionResult> DeleteAsync(string id)
         {
-            return StatusCode(501);
+            try
+            {
+                // TODO: Check if user exists
+                logger.LogInformation($"Deleting user with id {id}");
+                await userRepo.DeleteAsync(
+                    id,
+                    new RequestOptions { PartitionKey = new PartitionKey(id) })
+                    .ConfigureAwait(false);
+
+                logger.LogInformation($"Deleted user with id {id}");
+                return Ok();
+            }
+            catch (DocumentClientException ex)
+            {
+                Exception baseException = ex.GetBaseException();
+                string msg = $"Error: {ex.Message}, Message: {baseException.Message}";
+                logger.LogError($"Received error {msg}");
+                return NotFound(msg);
+            }
+            catch (Exception ex)
+            {
+                Exception baseException = ex.GetBaseException();
+                string msg = $"Error: {ex.Message}, Message: {baseException.Message}";
+                logger.LogError($"Received error {msg}");
+                return StatusCode(500, msg);
+            }
         }
     }
 }

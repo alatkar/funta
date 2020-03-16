@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Documents;
 using Microsoft.Azure.Documents.Client;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using PartyFindsApi.core;
 using PartyFindsApi.Models;
@@ -17,10 +18,12 @@ namespace PartyFindsApi.Controllers
     [ApiController]
     public class NotificationsController : ControllerBase
     {
+        private readonly ILogger _logger;
         IRepository notificationsRepo;
 
-        public NotificationsController()
+        public NotificationsController(ILogger<NotificationsController> logger)
         {
+            this._logger = logger;
             //_cosmosDbService = cosmosDbService;
             this.notificationsRepo = Container.Instance.notificationsRepo;
         }
@@ -49,7 +52,7 @@ namespace PartyFindsApi.Controllers
         {
             try
             {
-                var resp = await notificationsRepo.QueryAsync<Listing>($" where C.userId = '{userId}'", null);
+                var resp = await notificationsRepo.QueryAsync<Listing>($" where C.userId = '{userId}'", null).ConfigureAwait(false);
                 return Ok(JsonConvert.SerializeObject(resp, new JsonApiSerializerSettings()));
             }
             catch (Exception ex)
@@ -63,7 +66,7 @@ namespace PartyFindsApi.Controllers
         {
             try
             {
-                var result = await notificationsRepo.UpdateAsync(doc, null);
+                var result = await notificationsRepo.UpdateAsync(doc, null).ConfigureAwait(false);
                 Listing resp = (dynamic)result;
                 return Ok(JsonConvert.SerializeObject(resp, new JsonApiSerializerSettings()));
             }
@@ -87,7 +90,7 @@ namespace PartyFindsApi.Controllers
         {
             try
             {
-                var result = await notificationsRepo.CreateAsync(item, null);
+                var result = await notificationsRepo.CreateAsync(item, null).ConfigureAwait(false);
                 Listing resp = (dynamic)result;
                 return Ok(JsonConvert.SerializeObject(resp, new JsonApiSerializerSettings()));
             }

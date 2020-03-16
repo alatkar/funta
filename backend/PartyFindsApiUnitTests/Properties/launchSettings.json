@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "PartyFindsApiUnitTests": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Production"
+      }
+    }
+  }
+}

@@ -3,6 +3,7 @@
 // </copyright>
 
 using Azure.Storage.Blobs;
+using System;
 
 namespace PartyFindsApi.core
 {
@@ -11,7 +12,7 @@ namespace PartyFindsApi.core
     /// Dependency injection is not sufficient as we need different objects of same type for 
     /// handling cosmod db access.
     /// </summary>
-    public class Container
+    public class Container : IDisposable
     {
         //Repositories
         public IRepository listingsRepo { get; set; }
@@ -48,6 +49,14 @@ namespace PartyFindsApi.core
                 }
                 return instance;
             }
+        }
+
+        public void Dispose()
+        {
+            listingsRepo?.Dispose();
+            notificationsRepo?.Dispose();
+            messageRepo?.Dispose();
+            userRepo?.Dispose();
         }
     }
 }

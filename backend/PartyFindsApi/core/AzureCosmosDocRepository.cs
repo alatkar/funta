@@ -23,10 +23,17 @@ namespace PartyFindsApi.core
 
         public string collectionName { get; }
 
-        public static async Task<IRepository> CreateAzureCosmosDocRepository(string collection, string token)
+        /*public static async Task<IRepository> CreateAzureCosmosDocRepository(string collection, string token)
         {
             AzureCosmosDocRepository azureCosmosDocRepository = new AzureCosmosDocRepository(GetDocumentClient(token).Result, collection);
-            await azureCosmosDocRepository.Initialize();
+            await azureCosmosDocRepository.Initialize().ConfigureAwait(false);
+            return azureCosmosDocRepository;
+        }*/
+        
+        public static async Task<IRepository> CreateAzureCosmosDocRepository(string collection, DocumentClient client)
+        {
+            AzureCosmosDocRepository azureCosmosDocRepository = new AzureCosmosDocRepository(client, collection);
+            await azureCosmosDocRepository.Initialize().ConfigureAwait(false);
             return azureCosmosDocRepository;
         }
 
@@ -40,25 +47,27 @@ namespace PartyFindsApi.core
         {
             ResourceResponse<Database> resourceResponse = Task.Run(() =>
                client.CreateDatabaseIfNotExistsAsync(new Database { Id = databaseName })).Result;
+            var docCollection = new DocumentCollection { Id = this.collectionName };
+            docCollection.PartitionKey.Paths.Add("/id");
+
             await Task.Run(() =>
                  client.CreateDocumentCollectionIfNotExistsAsync
-                 (UriFactory.CreateDatabaseUri(databaseName), new DocumentCollection { Id = this.collectionName }));
-        }
-        public void Dispose()
-        {
-            throw new System.NotImplementedException();
+                 (UriFactory.CreateDatabaseUri(databaseName),
+                 docCollection)
+                 ).ConfigureAwait(false);
         }
 
         public async Task<T> GetAsync<T>(string id, RequestOptions options)
         {
             try
             {
-                var res = await this.client.ReadDocumentAsync(UriFactory.CreateDocumentUri(databaseName, this.collectionName, id), options);
+                var res = await this.client.ReadDocumentAsync(
+                    UriFactory.CreateDocumentUri(databaseName, this.collectionName, id), options).ConfigureAwait(false);
                 return (dynamic)res.Resource;
             }
             catch (Exception ex)
             {
-                Console.WriteLine("AzureCosmosDocRepository:GetAsync Error: {0}", ex.Message);
+                Console.WriteLine($"AzureCosmosDocRepository:GetAsync Error: {ex.Message}");
                 throw;
             }
         }
@@ -67,12 +76,13 @@ namespace PartyFindsApi.core
         {
             try
             {
-                var res = await this.client.CreateDocumentAsync(UriFactory.CreateDocumentCollectionUri(databaseName, collectionName), doc, options);
+                var res = await this.client.CreateDocumentAsync(
+                    UriFactory.CreateDocumentCollectionUri(databaseName, collectionName), doc, options).ConfigureAwait(false);
                 return (dynamic)res.Resource;
             }
             catch (Exception ex)
             {
-                Console.WriteLine("AzureCosmosDocRepository:CreateAsync Error: {0}", ex.Message);
+                Console.WriteLine($"AzureCosmosDocRepository:GetAsync Error: {ex.Message}");
                 throw;
             }
         }
@@ -82,7 +92,7 @@ namespace PartyFindsApi.core
             try
             {
                 var docUri = UriFactory.CreateDocumentUri(databaseName, collectionName, doc.Id);
-                var existing = await this.client.ReadDocumentAsync(docUri, options);
+                var existing = await this.client.ReadDocumentAsync(docUri, options).ConfigureAwait(false);
                 dynamic json = JObject.FromObject(doc);
                 //json.id = doc.Id; //Didn't understand why earlier approach didn't work                
                 var res = await this.client.ReplaceDocumentAsync(existing.Resource.SelfLink, json);
@@ -90,7 +100,7 @@ namespace PartyFindsApi.core
             }
             catch (Exception ex)
             {
-                Console.WriteLine("AzureCosmosDocRepository:UpdateAsync Error: {0}", ex.Message);
+                Console.WriteLine($"AzureCosmosDocRepository:GetAsync Error: {ex.Message}");
                 throw;
             }
         }
@@ -110,22 +120,28 @@ namespace PartyFindsApi.core
 
         public async Task DeleteAsync(string docId, RequestOptions options = null)
         {
-            var existing = await this.client.ReadDocumentAsync(UriFactory.CreateDocumentUri(databaseName, collectionName, docId));
-            await this.client.DeleteDocumentAsync(existing.Resource.SelfLink, options);
+            var existing = await this.client.ReadDocumentAsync(
+                UriFactory.CreateDocumentUri(databaseName, collectionName, docId),
+                options)
+                .ConfigureAwait(false);
+
+            await this.client.DeleteDocumentAsync(existing.Resource.SelfLink, options).ConfigureAwait(false);
         }
 
         public async Task<T> CreateIfNotExists<T>(T doc, FeedOptions options) where T : DocumentBase
         {
             try
             {
-                var res = await this.client.ReadDocumentAsync(UriFactory.CreateDocumentUri(databaseName, collectionName, doc.Id?.ToString()));
+                var res = await this.client.ReadDocumentAsync(
+                    UriFactory.CreateDocumentUri(databaseName, collectionName, doc.Id?.ToString())).ConfigureAwait(false);
                 return (dynamic)res.Resource;
             }
             catch (DocumentClientException de)
             {
                 if (de.StatusCode == HttpStatusCode.NotFound)
                 {
-                    var res = await this.client.CreateDocumentAsync(UriFactory.CreateDocumentCollectionUri(databaseName, collectionName), doc);
+                    var res = await this.client.CreateDocumentAsync(
+                        UriFactory.CreateDocumentCollectionUri(databaseName, collectionName), doc).ConfigureAwait(false);
                     return (dynamic)res.Resource;
                 }
                 else
@@ -143,14 +159,15 @@ namespace PartyFindsApi.core
             ClientCredential clientCred = new ClientCredential("b4ea2dba-cf3d-4309-8d6c-d3fe29807232",
             "hpPrDcv7SO63qvbhp+J9QOWePrywHES4u75Xxq7yGU8=");
             AuthenticationResult result = await authContext.AcquireTokenAsync(resource,
-            clientCred);
+            clientCred).ConfigureAwait(false);
             return result.AccessToken;
         }
 
         static async Task<DocumentClient> GetDocumentClient()
         {
             var kv = new KeyVaultClient(new KeyVaultClient.AuthenticationCallback(GetToken));
-            var dbKey = await kv.GetSecretAsync("https://funta.vault.azure.net/secrets/funtadb-key/bd0f813ed8c341ccb3b0baf2eb82bc46");
+            var dbKey = await kv.GetSecretAsync(
+                "https://funta.vault.azure.net/secrets/funtadb-key/bd0f813ed8c341ccb3b0baf2eb82bc46").ConfigureAwait(false);
 
             string EndpointUri = "https://funtadb.documents.azure.com:443/";
             var client = new DocumentClient(new Uri(EndpointUri), dbKey.Value);
@@ -158,12 +175,17 @@ namespace PartyFindsApi.core
             return client;
         }
 
-        static async Task<DocumentClient> GetDocumentClient(string token)
+        static DocumentClient GetDocumentClient(string token)
         {
             string EndpointUri = "https://funtadb.documents.azure.com:443/";
             var client = new DocumentClient(new Uri(EndpointUri), token);
 
             return client;
+        }
+
+        public void Dispose()
+        {
+            client?.Dispose();
         }
     }
 }

@@ -11,7 +11,7 @@ namespace PartyFindsApi.Models
     [JsonObject]
     public class Listing : DocumentBase
     {
-        [JsonProperty(PropertyName = "title")]
+        [JsonProperty(PropertyName = "title", Required = Required.Always)]
         public string Title { get; set; }
 
         [JsonProperty(PropertyName = "description")]
@@ -30,12 +30,12 @@ namespace PartyFindsApi.Models
 
         // TODO: Can this be Enum?? Outside world should see it as string
         // Type of service (Entertainment, Venue etc)
-        [JsonProperty(PropertyName = "listingType")]   
+        [JsonProperty(PropertyName = "listingType", Required = Required.Always)]
         public string ListingType { get; set; }
 
         // TODO: Can this be Enum?? Outside world should see it as string
         // Subtypes for each service (For Entrtainment: Musician, Magician etc)
-        [JsonProperty(PropertyName = "listingSubType")]
+        [JsonProperty(PropertyName = "listingSubType", Required = Required.Always)]
         public string ListingSubType { get; set; }
 
         // TODO: Can this be Enum?? Outside world should see it as string

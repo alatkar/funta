@@ -20,17 +20,17 @@ namespace PartyFindsApi.core
             string databaseName,
             string containerName)
         {
-            this._container = dbClient.GetContainer(databaseName, containerName);
+            this._container = dbClient?.GetContainer(databaseName, containerName);
         }
 
         public async Task AddItemAsync(Listing item)
         {
-            await this._container.CreateItemAsync<Listing>(item, new PartitionKey(item.Id));
+            await this._container.CreateItemAsync<Listing>(item, new PartitionKey(item?.Id)).ConfigureAwait(false);
         }
 
         public async Task DeleteItemAsync(string id)
         {
-            await this._container.DeleteItemAsync<Listing>(id, new PartitionKey(id));
+            await this._container.DeleteItemAsync<Listing>(id, new PartitionKey(id)).ConfigureAwait(false);
         }
 
         public void Dispose()
@@ -47,7 +47,8 @@ namespace PartyFindsApi.core
         {
             try
             {
-                ItemResponse<Listing> response = await this._container.ReadItemAsync<Listing>(id, new PartitionKey(id));
+                ItemResponse<Listing> response = 
+                    await this._container.ReadItemAsync<Listing>(id, new PartitionKey(id)).ConfigureAwait(false);
                 return response.Resource;
             }
             catch (CosmosException ex) when (ex.StatusCode == System.Net.HttpStatusCode.NotFound)
@@ -63,7 +64,7 @@ namespace PartyFindsApi.core
             List<Listing> results = new List<Listing>();
             while (query.HasMoreResults)
             {
-                var response = await query.ReadNextAsync();
+                var response = await query.ReadNextAsync().ConfigureAwait(false);
 
                 results.AddRange(response.ToList());
             }
@@ -73,7 +74,7 @@ namespace PartyFindsApi.core
 
         public async Task UpdateItemAsync(string id, Listing item)
         {
-            await this._container.UpsertItemAsync<Listing>(item, new PartitionKey(id));
+            await this._container.UpsertItemAsync<Listing>(item, new PartitionKey(id)).ConfigureAwait(false);
         }
     }
 }

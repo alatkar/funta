@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Documents;
 using Microsoft.Azure.Documents.Client;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using PartyFindsApi.core;
 using PartyFindsApi.Models;
@@ -21,10 +22,12 @@ namespace PartyFindsApi.Controllers
     [ApiController]
     public class MessagesController : ControllerBase
     {
+        private readonly ILogger _logger;
         IRepository messagesRepo;
 
-        public MessagesController()
+        public MessagesController(ILogger<MessagesController> logger)
         {
+            this._logger = logger;
             this.messagesRepo = Container.Instance.notificationsRepo;
         }
 
@@ -38,7 +41,7 @@ namespace PartyFindsApi.Controllers
 
             try
             {
-                var resp = await messagesRepo.QueryAsync<Message>("", feed);
+                var resp = await messagesRepo.QueryAsync<Message>("", feed).ConfigureAwait(false);
                 return Ok(JsonConvert.SerializeObject(resp, new JsonApiSerializerSettings()));
             }
             catch (Exception ex)
@@ -53,7 +56,7 @@ namespace PartyFindsApi.Controllers
         {
             try
             {
-                var resp = await messagesRepo.QueryAsync<Message>($" where C.id = '{userId}'", null);
+                var resp = await messagesRepo.QueryAsync<Message>($" where C.id = '{userId}'", null).ConfigureAwait(false);
                 return Ok(JsonConvert.SerializeObject(resp, new JsonApiSerializerSettings()));
             }
             catch (Exception ex)
@@ -67,7 +70,7 @@ namespace PartyFindsApi.Controllers
         {
             try
             {
-                var result = await messagesRepo.UpdateAsync(doc, null);
+                var result = await messagesRepo.UpdateAsync(doc, null).ConfigureAwait(false);
                 Message resp = (dynamic)result;
                 return Ok(JsonConvert.SerializeObject(resp, new JsonApiSerializerSettings()));
             }
@@ -91,7 +94,7 @@ namespace PartyFindsApi.Controllers
         {
             try
             {
-                var result = await messagesRepo.CreateAsync(item, null);
+                var result = await messagesRepo.CreateAsync(item, null).ConfigureAwait(false);
                 Message resp = (dynamic)result;
                 return Ok(JsonConvert.SerializeObject(resp, new JsonApiSerializerSettings()));
             }

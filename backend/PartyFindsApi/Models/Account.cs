@@ -21,6 +21,9 @@ namespace PartyFindsApi.Models
         [JsonProperty("accessFailedCount")]
         public int AccessFailedCount { get; set; }
 
+        [JsonProperty("emailConfirmationLink")]
+        public bool EmailConfirmationLink { get; set; }
+
         [JsonProperty("emailConfirmed")]
         public bool EmailConfirmed { get; set; }
 
@@ -31,6 +34,6 @@ namespace PartyFindsApi.Models
         public bool IsDeleted { get; set; }
 
         [JsonProperty("isLocked")]
-        public bool IsLocked { get; set; }        
+        public bool IsLocked { get; set; }
     }
 }

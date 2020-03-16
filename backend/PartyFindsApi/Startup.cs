@@ -2,8 +2,8 @@
 //   Copyright (c) PartyFinds LLC.  All rights reserved
 // </copyright>
 
+using System;
 using System.Threading.Tasks;
-using PartyFindsApi.core;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Azure.Cosmos;
@@ -14,7 +14,10 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Clients.ActiveDirectory;
 using Microsoft.OpenApi.Models;
+using Microsoft.Azure.Documents.Client;
 using Azure.Storage.Blobs;
+using PartyFindsApi.core;
+using Microsoft.Extensions.Logging;
 
 namespace PartyFindsApi
 {
@@ -40,27 +43,40 @@ namespace PartyFindsApi
             });
         }
 
-        static async Task<string> GetToken(string authority /*= "https://login.windows.net/alatkaryahoo.onmicrosoft.com"*/,
+        public async Task<string> GetSecret(string secret)
+        {
+            if (!string.IsNullOrEmpty(secret) && secret.Contains("secrets", StringComparison.InvariantCultureIgnoreCase))
+            {
+                //TODO: Get from KeyVault
+                return secret;
+            }
+            else
+            {
+                return secret;
+            }
+        }
+
+        async Task<string> GetToken(string authority /*= "https://login.windows.net/alatkaryahoo.onmicrosoft.com"*/,
            string resource /* ="https://funta.vault.azure.net"*/, string scope)
         {
             // Get Key from Keyvault
             var authContext = new AuthenticationContext(authority);
-            ClientCredential clientCred = new ClientCredential("b4ea2dba-cf3d-4309-8d6c-d3fe29807232",
-            "hpPrDcv7SO63qvbhp+J9QOWePrywHES4u75Xxq7yGU8=");
-            AuthenticationResult result = await authContext.AcquireTokenAsync(resource,
-            clientCred);
+            ClientCredential clientCred = new ClientCredential(
+                Configuration.GetValue<string>("KeyVault:AzureADApplicationId"),//"b4ea2dba-cf3d-4309-8d6c-d3fe29807232",
+                Configuration.GetValue<string>("KeyVault:AzureADApplicationSecret"));//"hpPrDcv7SO63qvbhp+J9QOWePrywHES4u75Xxq7yGU8=");
+            AuthenticationResult result = await authContext.AcquireTokenAsync(resource, clientCred).ConfigureAwait(false);
             return result.AccessToken;
         }
 
-        public static async Task<string> GetToken()
+        public async Task<string> GetToken()
         {
             var kv = new KeyVaultClient(new KeyVaultClient.AuthenticationCallback(GetToken));
-            var dbKey = await kv.GetSecretAsync("https://funta.vault.azure.net/secrets/funtadb-key/bd0f813ed8c341ccb3b0baf2eb82bc46");
+            var dbKey = await kv.GetSecretAsync("https://funta.vault.azure.net/secrets/funtadb-key/");
             return dbKey.Value;
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILogger<Startup> logger)
         {
             // Enable middleware to serve generated Swagger as a JSON endpoint.
             app.UseSwagger();
@@ -69,10 +85,11 @@ namespace PartyFindsApi
             // specifying the Swagger JSON endpoint.
             app.UseSwaggerUI(c =>
             {
-                c.SwaggerEndpoint("./swagger/swagger.json", "API");
-                c.RoutePrefix = string.Empty;
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "API V1");
+                //c.RoutePrefix = string.Empty;
             });
 
+            logger.LogInformation($"Application: {env?.ApplicationName} Environment: {env.EnvironmentName}");
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -89,15 +106,40 @@ namespace PartyFindsApi
                 endpoints.MapControllers();
             });
 
-            var token = Startup.GetToken().Result;
-            core.Container.Instance.listingsRepo = AzureCosmosDocRepository.CreateAzureCosmosDocRepository("Listings", token).Result;
-            core.Container.Instance.messageRepo = AzureCosmosDocRepository.CreateAzureCosmosDocRepository("Messages", token).Result;
-            core.Container.Instance.notificationsRepo = AzureCosmosDocRepository.CreateAzureCosmosDocRepository("Notifications", token).Result;
-            core.Container.Instance.userRepo = AzureCosmosDocRepository.CreateAzureCosmosDocRepository("Users", token).Result;
+            // Create Azure resources
+            
+            // Connect to the Azure Cosmos
+            DocumentClient client = new DocumentClient(
+               new Uri(Configuration.GetSection("CosmosDb")["EndPoint"]),
+               GetSecret(Configuration.GetSection("CosmosDb")["Key"]).Result);
 
-            // TODO: Change this for not to use connection string
-            BlobServiceClient blobServiceClient = new BlobServiceClient("DefaultEndpointsProtocol=https;AccountName=partyfindsstoragedev;AccountKey=h/4vuXYt3pKpfale7MAkH4nsvVVpCi+8TyLgmxzSeRUEkcbJc5BBp7jQvn8biARUJ7GSMNpW4EJ8rHoDYIygYw==;EndpointSuffix=core.windows.net");
+            PartyFindsApi.core.Container.Instance.listingsRepo = 
+                AzureCosmosDocRepository.CreateAzureCosmosDocRepository("Listings", client).Result;
+            PartyFindsApi.core.Container.Instance.messageRepo = 
+                AzureCosmosDocRepository.CreateAzureCosmosDocRepository("Messages", client).Result;
+            PartyFindsApi.core.Container.Instance.notificationsRepo = 
+                AzureCosmosDocRepository.CreateAzureCosmosDocRepository("Notifications", client).Result;
+            PartyFindsApi.core.Container.Instance.userRepo = 
+                AzureCosmosDocRepository.CreateAzureCosmosDocRepository("Users", client).Result;
+
+            // TODO: Old code based on Token. Migrate to KeyVault or managed identity
+            //var token = GetToken().Result;
+            //core.Container.Instance.listingsRepo = AzureCosmosDocRepository.CreateAzureCosmosDocRepository("Listings", token).Result;
+
+            // Blob Container
+            string endpointSuffix = Configuration.GetValue<string>("Storage:EndpointSuffix");
+            if (!string.IsNullOrEmpty(endpointSuffix))
+            {
+                endpointSuffix = $";EndpointSuffix={endpointSuffix}";
+            }
+
+            BlobServiceClient blobServiceClient = new BlobServiceClient
+                ($"DefaultEndpointsProtocol=http;" +
+                $"AccountName={Configuration.GetValue<string>("Storage:AccountName")};" +
+                $"AccountKey={GetSecret(Configuration.GetValue<string>("Storage:Key")).Result};" +
+                $"{endpointSuffix};BlobEndpoint={Configuration.GetValue<string>("Storage:BlobEndpoint")};");
             core.Container.Instance.uploadsContainer = blobServiceClient.GetBlobContainerClient("uploads");
+            core.Container.Instance.uploadsContainer.CreateIfNotExists();
         }
 
         /// <summary>
