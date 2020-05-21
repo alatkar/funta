@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using JsonApiSerializer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Documents.Client;
 using Microsoft.Extensions.Logging;
@@ -28,7 +29,7 @@ namespace PartyFindsApi.Controllers
             this.userRepo = Container.Instance.userRepo;
         }
 
-        //TODO: Token management
+        [Authorize]
         [Route("api/login")]
         [HttpPost]
         public async Task<IActionResult> LoginAsync([FromBody]Models.Account userInput)
@@ -55,8 +56,8 @@ namespace PartyFindsApi.Controllers
 
             return Ok(JsonConvert.SerializeObject(user, new JsonApiSerializerSettings()));
         }
-        
-        //TODO: Token management
+
+        [Authorize]
         [Route("api/logout")]
         [HttpPost]
         public async Task<IActionResult> LogoutAsync([FromBody]Models.Account user)
@@ -72,10 +73,24 @@ namespace PartyFindsApi.Controllers
             return Ok(JsonConvert.SerializeObject(registeredUser, new JsonApiSerializerSettings()));
         }
 
+        // TODO: Save object id from AAD for logging purposes
+        [Authorize]
         [Route("api/register")]
         [HttpPost]
-        public async Task<IActionResult> RegisterAsync([FromBody]Models.Account user)
+        public async Task<IActionResult> RegisterAsync()
         {
+            var claims = HttpContext.User.Claims;
+            string UserName = claims.FirstOrDefault(c => c.Type == "name").Value;
+            string Emails = claims.FirstOrDefault(c => c.Type == "emails").Value;
+
+            Models.User user = new Models.User
+            {
+                Email = claims.FirstOrDefault(c => c.Type == "emails").Value,
+                UserName = (UserName == "unknown") ? Emails : UserName,
+                FirstName = claims.FirstOrDefault(c => c.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname").Value,
+                LastName = claims.FirstOrDefault(c => c.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname").Value,
+            };
+
             logger.LogInformation($"Registering user {user?.Email}");
 
             if (string.IsNullOrEmpty(user?.Email))
@@ -83,10 +98,11 @@ namespace PartyFindsApi.Controllers
                 return BadRequest($"Email not provided");
             }
 
-            if (string.IsNullOrEmpty(user.PasswordHash))
-            {
-                return BadRequest($"Password not provided");
-            }
+            // Not using password anymore
+            //if (string.IsNullOrEmpty(user.PasswordHash))
+            //{
+            //    return BadRequest($"Password not provided");
+            //}
 
             IList<Models.User> users = null;
             var feedOptions = new FeedOptions { EnableCrossPartitionQuery = true };
@@ -122,6 +138,7 @@ namespace PartyFindsApi.Controllers
             }
         }
 
+        [Authorize]
         [Route("api/resetpassword")]
         [HttpPost]
         public IActionResult ResetPasswordAsync([FromBody]Models.User user)
@@ -129,6 +146,7 @@ namespace PartyFindsApi.Controllers
             return Ok(new string[] { "ResetPasswordAsync:username", "ResetPasswordAsync:password" });
         }
 
+        [Authorize]
         [Route("api/confirmemail")]
         [HttpPost]
         public IActionResult ConfirmEmailAsync([FromBody]Models.User user)

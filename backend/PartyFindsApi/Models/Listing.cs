@@ -50,7 +50,7 @@ namespace PartyFindsApi.Models
         public int ServiceRadius { get; set; }
 
         // User owning this listing
-        [JsonProperty(PropertyName = "userId", Required = Required.Always)]
+        [JsonProperty(PropertyName = "userId")]
         public string UserId { get; set; }
 
         // Upalod images

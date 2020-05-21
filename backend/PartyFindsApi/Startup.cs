@@ -18,6 +18,8 @@ using Microsoft.Azure.Documents.Client;
 using Azure.Storage.Blobs;
 using PartyFindsApi.core;
 using Microsoft.Extensions.Logging;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using System.Text;
 
 namespace PartyFindsApi
 {
@@ -33,6 +35,22 @@ namespace PartyFindsApi
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddAuthentication(options =>
+            {
+                options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+               .AddJwtBearer(jwtOptions =>
+               {
+                   jwtOptions.Authority = $"https://partyfinds.b2clogin.com/{Configuration["AzureAdB2C:Tenant"]}/{Configuration["AzureAdB2C:Policy"]}/v2.0/";
+                   jwtOptions.Audience = Configuration["AzureAdB2C:ClientId"];
+                    //jwtOptions.Events = new JwtBearerEvents
+                    //{
+                    //    OnAuthenticationFailed = AuthenticationFailed,
+                    //    OnForbidden = OnMessageReceivedAsync
+                    //};
+                });
+
+
             //services.AddSingleton<ICosmosDbService>(InitializeCosmosClientInstanceAsync(Configuration.GetSection("CosmosDb")).GetAwaiter().GetResult());
             services.AddControllers().AddNewtonsoftJson();
 
@@ -41,6 +59,91 @@ namespace PartyFindsApi
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "API", Version = "v1" });
             });
+        }
+
+        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILogger<Startup> logger)
+        {
+            // Enable middleware to serve generated Swagger as a JSON endpoint.
+            app.UseSwagger();
+
+            // Enable middleware to serve swagger-ui (HTML, JS, CSS, etc.),
+            // specifying the Swagger JSON endpoint.
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "API V1");
+                //c.RoutePrefix = string.Empty;
+            });
+
+            logger.LogInformation($"Application: {env?.ApplicationName} Environment: {env.EnvironmentName}");
+            if (env.IsDevelopment())
+            {
+                app.UseDeveloperExceptionPage();
+            }
+
+            app.UseHttpsRedirection();
+
+            app.UseRouting();
+            app.UseAuthentication();
+            app.UseAuthorization();
+            
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapControllers();
+            });
+
+            // Create Azure resources
+
+            // Connect to the Azure Cosmos
+            DocumentClient client = new DocumentClient(
+               new Uri(Configuration.GetSection("CosmosDb")["EndPoint"]),
+               GetSecret(Configuration.GetSection("CosmosDb")["Key"]).Result);
+
+            PartyFindsApi.core.Container.Instance.listingsRepo =
+                AzureCosmosDocRepository.CreateAzureCosmosDocRepository("Listings", client).Result;
+            PartyFindsApi.core.Container.Instance.messageRepo =
+                AzureCosmosDocRepository.CreateAzureCosmosDocRepository("Messages", client).Result;
+            PartyFindsApi.core.Container.Instance.notificationsRepo =
+                AzureCosmosDocRepository.CreateAzureCosmosDocRepository("Notifications", client).Result;
+            PartyFindsApi.core.Container.Instance.userRepo =
+                AzureCosmosDocRepository.CreateAzureCosmosDocRepository("Users", client).Result;
+
+            // TODO: Old code based on Token. Migrate to KeyVault or managed identity
+            //var token = GetToken().Result;
+            //core.Container.Instance.listingsRepo = AzureCosmosDocRepository.CreateAzureCosmosDocRepository("Listings", token).Result;
+
+            // Blob Container
+            string endpointSuffix = Configuration.GetValue<string>("Storage:EndpointSuffix");
+            if (!string.IsNullOrEmpty(endpointSuffix))
+            {
+                endpointSuffix = $";EndpointSuffix={endpointSuffix}";
+            }
+
+            BlobServiceClient blobServiceClient = new BlobServiceClient
+                ($"DefaultEndpointsProtocol=http;" +
+                $"AccountName={Configuration.GetValue<string>("Storage:AccountName")};" +
+                $"AccountKey={GetSecret(Configuration.GetValue<string>("Storage:Key")).Result};" +
+                $"{endpointSuffix};BlobEndpoint={Configuration.GetValue<string>("Storage:BlobEndpoint")};");
+            core.Container.Instance.uploadsContainer = blobServiceClient.GetBlobContainerClient("uploads");
+            core.Container.Instance.uploadsContainer.CreateIfNotExists();
+        }
+
+        private Task AuthenticationFailed(AuthenticationFailedContext arg)
+        {
+            // For debugging purposes only!
+            var s = $"AuthenticationFailed: {arg.Exception.Message}";
+            arg.Response.ContentLength = s.Length;
+            arg.Response.Body.WriteAsync(Encoding.UTF8.GetBytes(s), 0, s.Length);
+            return Task.FromResult(0);
+        }
+
+        private Task OnMessageReceivedAsync(ForbiddenContext arg)
+        {
+            // For debugging purposes only!
+            var s = $"OnMessageReceivedAsync: {arg.HttpContext}";
+            arg.Response.ContentLength = s.Length;
+            arg.Response.Body.WriteAsync(Encoding.UTF8.GetBytes(s), 0, s.Length);
+            return Task.FromResult(0);
         }
 
         public async Task<string> GetSecret(string secret)
@@ -73,73 +176,6 @@ namespace PartyFindsApi
             var kv = new KeyVaultClient(new KeyVaultClient.AuthenticationCallback(GetToken));
             var dbKey = await kv.GetSecretAsync("https://funta.vault.azure.net/secrets/funtadb-key/");
             return dbKey.Value;
-        }
-
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILogger<Startup> logger)
-        {
-            // Enable middleware to serve generated Swagger as a JSON endpoint.
-            app.UseSwagger();
-
-            // Enable middleware to serve swagger-ui (HTML, JS, CSS, etc.),
-            // specifying the Swagger JSON endpoint.
-            app.UseSwaggerUI(c =>
-            {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "API V1");
-                //c.RoutePrefix = string.Empty;
-            });
-
-            logger.LogInformation($"Application: {env?.ApplicationName} Environment: {env.EnvironmentName}");
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-            }
-
-            app.UseHttpsRedirection();
-
-            app.UseRouting();
-
-            app.UseAuthorization();
-
-            app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapControllers();
-            });
-
-            // Create Azure resources
-            
-            // Connect to the Azure Cosmos
-            DocumentClient client = new DocumentClient(
-               new Uri(Configuration.GetSection("CosmosDb")["EndPoint"]),
-               GetSecret(Configuration.GetSection("CosmosDb")["Key"]).Result);
-
-            PartyFindsApi.core.Container.Instance.listingsRepo = 
-                AzureCosmosDocRepository.CreateAzureCosmosDocRepository("Listings", client).Result;
-            PartyFindsApi.core.Container.Instance.messageRepo = 
-                AzureCosmosDocRepository.CreateAzureCosmosDocRepository("Messages", client).Result;
-            PartyFindsApi.core.Container.Instance.notificationsRepo = 
-                AzureCosmosDocRepository.CreateAzureCosmosDocRepository("Notifications", client).Result;
-            PartyFindsApi.core.Container.Instance.userRepo = 
-                AzureCosmosDocRepository.CreateAzureCosmosDocRepository("Users", client).Result;
-
-            // TODO: Old code based on Token. Migrate to KeyVault or managed identity
-            //var token = GetToken().Result;
-            //core.Container.Instance.listingsRepo = AzureCosmosDocRepository.CreateAzureCosmosDocRepository("Listings", token).Result;
-
-            // Blob Container
-            string endpointSuffix = Configuration.GetValue<string>("Storage:EndpointSuffix");
-            if (!string.IsNullOrEmpty(endpointSuffix))
-            {
-                endpointSuffix = $";EndpointSuffix={endpointSuffix}";
-            }
-
-            BlobServiceClient blobServiceClient = new BlobServiceClient
-                ($"DefaultEndpointsProtocol=http;" +
-                $"AccountName={Configuration.GetValue<string>("Storage:AccountName")};" +
-                $"AccountKey={GetSecret(Configuration.GetValue<string>("Storage:Key")).Result};" +
-                $"{endpointSuffix};BlobEndpoint={Configuration.GetValue<string>("Storage:BlobEndpoint")};");
-            core.Container.Instance.uploadsContainer = blobServiceClient.GetBlobContainerClient("uploads");
-            core.Container.Instance.uploadsContainer.CreateIfNotExists();
         }
 
         /// <summary>

@@ -15,6 +15,8 @@ using JsonApiSerializer;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.Extensions.Logging;
 using System.Net;
+using Microsoft.AspNetCore.Authorization;
+using System.Collections.Generic;
 
 namespace PartyFindsApi.Controllers
 {
@@ -112,13 +114,25 @@ namespace PartyFindsApi.Controllers
         /// <returns>A newly created TodoItem</returns>
         /// <response code="201">Returns the newly created item</response>
         /// <response code="400">If the item is null</response>   
+        [Authorize]
         [HttpPost]
         public async Task<IActionResult> PostAsync([FromBody] Listing item)
         {
-            if (!ModelState.IsValid)
+            if (!ModelState.IsValid || item == null)
             {
                 return BadRequest(ModelState);
             }
+
+            // Get user Id from token
+            var claims = HttpContext.User.Claims;            
+            string Email = claims.FirstOrDefault(c => c.Type == "emails").Value;
+            var feedOptions = new FeedOptions { EnableCrossPartitionQuery = true };
+            IList<Models.User> users =  await userRepo.QueryAsync<Models.User>($" where C.email = '{Email}'", feedOptions).ConfigureAwait(false);
+            if (users == null && users.Count != 0)
+            {
+                return BadRequest($"Email {users[0].Email} is not registered");
+            }
+            item.UserId = users[0].Id;
 
             if (item == null || item.UserId == null)
             {
@@ -162,6 +176,7 @@ namespace PartyFindsApi.Controllers
             }
         }
 
+        [Authorize]
         [HttpPatch("{id}")]
         public async Task<IActionResult> PatchAsync(string id, [FromBody] JsonPatchDocument<Listing> patchDoc)
         {
@@ -176,6 +191,21 @@ namespace PartyFindsApi.Controllers
                 if(listing == null)
                 {
                     return NotFound($"The Listing with id {id} is not found");
+                }
+
+                // Check if token is for same user
+                var claims = HttpContext.User.Claims;
+                string Email = claims.FirstOrDefault(c => c.Type == "emails").Value;
+                var feedOptions = new FeedOptions { EnableCrossPartitionQuery = true };
+                IList<Models.User> users = await userRepo.QueryAsync<Models.User>($" where C.email = '{Email}'", feedOptions).ConfigureAwait(false);
+                if (users == null || users.Count != 0)
+                {
+                    return BadRequest($"Email {users[0].Email} is not registered");
+                }
+
+                if (listing.UserId != users[0].Id)
+                {
+                    return Unauthorized($"Not allowed to update listing from another user {users[0].Email}");
                 }
 
                 patchDoc.ApplyTo(listing, ModelState);
@@ -209,6 +239,7 @@ namespace PartyFindsApi.Controllers
         }
 
         // DELETE: api/ApiWithActions/5
+        [Authorize]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteAsync(string id)
         {
@@ -216,6 +247,32 @@ namespace PartyFindsApi.Controllers
             {
                 logger.LogError($"Id not present {id}");
                 throw new ArgumentException($"Please provide Listing Id  {id}", nameof(id));
+            }
+
+            logger.LogInformation($"Updating listing with id {id}");
+
+            var resp = await listingsRepo.QueryAsync<Listing>($" where C.id = '{id}'", new FeedOptions { PartitionKey = new PartitionKey(id) }).ConfigureAwait(false);
+
+            var listing = resp.FirstOrDefault<Listing>();
+
+            if (listing == null)
+            {
+                return NotFound($"The Listing with id {id} is not found");
+            }
+
+            // Check if token is for same user
+            var claims = HttpContext.User.Claims;
+            string Email = claims.FirstOrDefault(c => c.Type == "emails").Value;
+            var feedOptions = new FeedOptions { EnableCrossPartitionQuery = true };
+            IList<Models.User> users = await userRepo.QueryAsync<Models.User>($" where C.email = '{Email}'", feedOptions).ConfigureAwait(false);
+            if (users == null || users.Count != 0)
+            {
+                return BadRequest($"Email {users[0].Email} is not registered");
+            }
+
+            if (listing.UserId != users[0].Id)
+            {
+                return Unauthorized($"Not allowed to update listing from another user {users[0].Email}");
             }
 
             try
