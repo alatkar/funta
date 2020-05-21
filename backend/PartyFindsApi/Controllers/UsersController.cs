@@ -3,8 +3,11 @@
 // </copyright>
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using JsonApiSerializer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Documents;
@@ -74,6 +77,7 @@ namespace PartyFindsApi.Controllers
             }
         }
 
+        [Authorize]
         [HttpPatch]
         public async Task<IActionResult> PatchAsync(string id, [FromBody]JsonPatchDocument<Models.User> patchDoc)
         {
@@ -87,6 +91,14 @@ namespace PartyFindsApi.Controllers
                 if (user == null)
                 {
                     return NotFound($"The user with id {id} is not found");
+                }
+
+                // Check token is from same user
+                string Email = HttpContext.User.Claims.FirstOrDefault(c => c.Type == "emails").Value;
+                if (Email != user.Email)
+                {
+                    logger.LogError($"User Id doesn't match with the token {Email}");
+                    return Unauthorized($"User Id doesn't match with the token {Email}");
                 }
 
                 patchDoc.ApplyTo(user, ModelState);
@@ -117,11 +129,31 @@ namespace PartyFindsApi.Controllers
             }
         }
 
+        // TODO: Only admins can delete account
+        [Authorize]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteAsync(string id)
         {
             try
             {
+                var user = await userRepo.GetAsync<Models.User>(
+                    id,
+                    new RequestOptions { PartitionKey = new PartitionKey(id) })
+                    .ConfigureAwait(false);
+
+                if (user == null)
+                {
+                    return NotFound($"The user with id {id} is not found");
+                }
+
+                // Check token is from same user
+                string Email = HttpContext.User.Claims.FirstOrDefault(c => c.Type == "emails").Value;
+                if (Email != user.Email)
+                {
+                    logger.LogError($"User Id doesn't match with the token {Email}");
+                    return Unauthorized($"User Id doesn't match with the token {Email}");
+                }
+
                 // TODO: Check if user exists
                 logger.LogInformation($"Deleting user with id {id}");
                 await userRepo.DeleteAsync(
